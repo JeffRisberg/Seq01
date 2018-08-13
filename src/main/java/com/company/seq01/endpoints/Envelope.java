@@ -1,4 +1,4 @@
-package com.company.jersey04.endpoints;
+package com.company.seq01.endpoints;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

@@ -1,8 +1,8 @@
-package com.company.jersey04.endpoints;
+package com.company.seq01.endpoints;
 
 import com.company.common.FilterDesc;
 import com.company.common.SortDesc;
-import com.company.jersey04.services.CharityService;
+import com.company.seq01.services.JobService;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -10,12 +10,12 @@ import javax.ws.rs.core.*;
 import java.util.List;
 
 @Path("charities")
-public class CharityEndpoint extends AbstractEndpoint {
+public class JobEndpoint extends AbstractEndpoint {
 
-    protected CharityService charityService;
+    protected JobService jobService;
 
     @Inject
-    public CharityEndpoint(CharityService charityService) {
+    public JobEndpoint(CharityService charityService) {
         this.charityService = charityService;
     }
 

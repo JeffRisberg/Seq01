@@ -1,4 +1,4 @@
-package com.company.jersey04.models;
+package com.company.seq01.models;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;

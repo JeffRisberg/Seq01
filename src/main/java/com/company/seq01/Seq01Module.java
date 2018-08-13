@@ -1,7 +1,5 @@
 package com.company.jersey04;
 
-import com.company.jersey04.endpoints.CharityEndpoint;
-import com.company.jersey04.endpoints.DonorEndpoint;
 import com.company.common.services.MicroserviceModule;
 import com.google.inject.Scopes;
 import com.company.common.base.binding.annotation.MySQL;
@@ -43,8 +41,8 @@ public class Jersey04Module extends MicroserviceModule {
     public List<Class<?>> resources() {
         return Arrays.asList(
                 // SystemEndpoint.class  -- this should exist
-                CharityEndpoint.class,
-                DonorEndpoint.class
+                com.company.jersey04.endpoints.JobEndpoint.class,
+                com.company.jersey04.endpoints.JobExecutionEndpoint.class
         );
     }
 

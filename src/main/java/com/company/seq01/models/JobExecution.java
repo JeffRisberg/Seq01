@@ -1,4 +1,4 @@
-package com.company.jersey04.models;
+package com.company.seq01.models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.company.jersey04.endpoints;
+package com.company.seq01.endpoints;
 
 import com.company.common.*;
 
@@ -68,19 +68,19 @@ public class AbstractEndpoint {
      * @param data if null, triggers 404 status code.
      * @return Response
      */
-    protected Response createEntityResponse(Object data, List<com.company.jersey04.endpoints.Error> errors) {
-        List<com.company.jersey04.endpoints.Error> resultErrors = new ArrayList<com.company.jersey04.endpoints.Error>();
+    protected Response createEntityResponse(Object data, List<com.company.seq01.endpoints.Error> errors) {
+        List<com.company.seq01.endpoints.Error> resultErrors = new ArrayList<com.company.seq01.endpoints.Error>();
 
         Envelope envelope = new Envelope(data, resultErrors);
 
         if (errors != null) {
-            for (com.company.jersey04.endpoints.Error error : errors) {
+            for (com.company.seq01.endpoints.Error error : errors) {
                 resultErrors.add(error);
             }
         }
 
         if (data == null) {
-            resultErrors.add(new com.company.jersey04.endpoints.Error("Not found"));
+            resultErrors.add(new com.company.seq01.endpoints.Error("Not found"));
 
             return Response.status(Response.Status.NOT_FOUND).entity(envelope).build();
         } else {
@@ -102,16 +102,16 @@ public class AbstractEndpoint {
             long totalCount,
             int limit,
             int offset,
-            List<com.company.jersey04.endpoints.Error> errors) {
+            List<com.company.seq01.endpoints.Error> errors) {
         if (data == null) {
             throw new IllegalArgumentException("missing data");
         }
 
-        List<com.company.jersey04.endpoints.Error> resultErrors = new ArrayList<com.company.jersey04.endpoints.Error>();
+        List<com.company.seq01.endpoints.Error> resultErrors = new ArrayList<com.company.seq01.endpoints.Error>();
         Envelope envelope = new Envelope(data, totalCount, limit, offset, errors);
 
         if (errors != null) {
-            for (com.company.jersey04.endpoints.Error error : errors) {
+            for (com.company.seq01.endpoints.Error error : errors) {
                 resultErrors.add(error);
             }
         }
@@ -125,19 +125,19 @@ public class AbstractEndpoint {
      * @param errors
      * @return
      */
-    protected Response createDeleteResponse(Object data, List<com.company.jersey04.endpoints.Error> errors)
+    protected Response createDeleteResponse(Object data, List<com.company.seq01.endpoints.Error> errors)
             throws WebApplicationException {
-        List<com.company.jersey04.endpoints.Error> resultErrors = new ArrayList<com.company.jersey04.endpoints.Error>();
+        List<com.company.seq01.endpoints.Error> resultErrors = new ArrayList<com.company.seq01.endpoints.Error>();
         Envelope envelope = new Envelope(data, errors);
 
         if (errors != null) {
-            for (com.company.jersey04.endpoints.Error error : errors) {
+            for (com.company.seq01.endpoints.Error error : errors) {
                 resultErrors.add(error);
             }
         }
 
         if (data == null) {
-            resultErrors.add(new com.company.jersey04.endpoints.Error("Not found"));
+            resultErrors.add(new com.company.seq01.endpoints.Error("Not found"));
 
             throw new WebApplicationException(
                     Response.status(Response.Status.NOT_FOUND).entity(envelope).build());
