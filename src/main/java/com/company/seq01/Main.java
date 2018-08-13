@@ -1,4 +1,4 @@
-package com.company.jersey04;
+package com.company.seq01;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;

@@ -64,5 +64,7 @@ dependencies {
     compile "com.zaxxer:HikariCP:2.7.7"
     compile "mysql:mysql-connector-java:5.1.45"
 
+    compile group: 'io.kubernetes', name: 'client-java', version: '1.0.0'
+
     testCompile "junit:junit:$junitVersion"
 }

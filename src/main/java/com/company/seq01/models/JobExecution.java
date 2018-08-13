@@ -2,6 +2,7 @@ package com.company.seq01.models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,8 +14,9 @@ import javax.persistence.Table;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
-@Table(name = "Donors")
+@Table(name = "job_executions")
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class JobExecution extends AbstractEntity {
 
     @Column(name = "first_name")

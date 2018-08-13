@@ -1,4 +1,4 @@
-package com.company.jersey04;
+package com.company.seq01;
 
 import com.google.inject.Guice;
 import org.glassfish.hk2.api.ServiceLocator;

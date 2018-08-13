@@ -1,4 +1,4 @@
-package com.company.jersey04;
+package com.company.seq01;
 
 import com.company.common.services.MicroserviceModule;
 import com.google.inject.Scopes;
@@ -18,8 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public class Jersey04Module extends MicroserviceModule {
-    private static final Logger logger = LoggerFactory.getLogger(Jersey04Module.class);
+public class Seq01Module extends MicroserviceModule {
+    private static final Logger logger = LoggerFactory.getLogger(Seq01Module.class);
 
     @Override
     public void configureDependencies() {
@@ -34,15 +34,15 @@ public class Jersey04Module extends MicroserviceModule {
 
     @Override
     protected String programName() {
-        return "jersey2-service";
+        return "seq01-service";
     }
 
     @Override
     public List<Class<?>> resources() {
         return Arrays.asList(
                 // SystemEndpoint.class  -- this should exist
-                com.company.jersey04.endpoints.JobEndpoint.class,
-                com.company.jersey04.endpoints.JobExecutionEndpoint.class
+                com.company.seq01.endpoints.JobEndpoint.class,
+                com.company.seq01.endpoints.JobExecutionEndpoint.class
         );
     }
 
