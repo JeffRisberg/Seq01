@@ -2,6 +2,7 @@ package com.company.seq01.endpoints;
 
 import com.company.common.FilterDesc;
 import com.company.common.SortDesc;
+import com.company.seq01.models.Job;
 import com.company.seq01.services.JobService;
 
 import javax.inject.Inject;
@@ -15,8 +16,8 @@ public class JobEndpoint extends AbstractEndpoint {
     protected JobService jobService;
 
     @Inject
-    public JobEndpoint(CharityService charityService) {
-        this.charityService = charityService;
+    public JobEndpoint(JobService jobService) {
+        this.jobService = jobService;
     }
 
     @GET
@@ -24,7 +25,7 @@ public class JobEndpoint extends AbstractEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response fetch(@PathParam("id") Integer id) {
 
-        com.company.jersey04.models.Job data = charityService.getCharity(id);
+        Job data = null;// jobService.getCharity(id);
 
         return createEntityResponse(data, null);
     }
@@ -41,8 +42,8 @@ public class JobEndpoint extends AbstractEndpoint {
         List<FilterDesc> filterDescs = this.parseFiltering(queryParams);
         List<SortDesc> sortDescs = this.parseSortStr(sortStr);
 
-        List<com.company.jersey04.models.Job> data = charityService.getCharities(limit, offset, filterDescs);
-        long totalCount = charityService.getCharitiesCount(filterDescs);
+        List<Job> data = null;// charityService.getCharities(limit, offset, filterDescs);
+        long totalCount = 0;//charityService.getCharitiesCount(filterDescs);
 
         return createEntityListResponse(data, totalCount, limit, offset, null);
     }
@@ -52,7 +53,7 @@ public class JobEndpoint extends AbstractEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response delete(@PathParam("id") Integer id) {
 
-        com.company.jersey04.models.Job data = charityService.getCharity(id);
+        Job data = null;// charityService.getCharity(id);
 
         return createDeleteResponse(data, null);
     }

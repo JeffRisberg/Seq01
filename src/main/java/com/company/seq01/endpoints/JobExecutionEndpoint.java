@@ -2,20 +2,22 @@ package com.company.seq01.endpoints;
 
 import com.company.common.FilterDesc;
 import com.company.common.SortDesc;
+import com.company.seq01.models.JobExecution;
+import com.company.seq01.services.JobExecutionService;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.List;
 
-@Path("donors")
+@Path("jobExecutions")
 public class JobExecutionEndpoint extends AbstractEndpoint {
 
-    protected JobExecutionService donorService;
+    protected JobExecutionService jobExecutionService;
 
     @Inject
-    public JobExecutionEndpoint(DonorService donorService) {
-        this.donorService = donorService;
+    public JobExecutionEndpoint(JobExecutionService jobExecutionService) {
+        this.jobExecutionService = jobExecutionService;
     }
 
     @GET
@@ -23,7 +25,7 @@ public class JobExecutionEndpoint extends AbstractEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response fetch(@PathParam("id") Integer id) {
 
-        com.company.jersey04.models.JobExecution data = donorService.getDonor(id);
+        JobExecution data = null;//donorService.getDonor(id);
 
         return createEntityResponse(data, null);
     }
@@ -40,8 +42,8 @@ public class JobExecutionEndpoint extends AbstractEndpoint {
         List<FilterDesc> filterDescs = this.parseFiltering(queryParams);
         List<SortDesc> sortDescs = this.parseSortStr(sortStr);
 
-        List<com.company.jersey04.models.JobExecution> data = donorService.getDonors(limit, offset, filterDescs);
-        long totalCount = donorService.getDonorsCount(filterDescs);
+        List<JobExecution> data = null;//donorService.getDonors(limit, offset, filterDescs);
+        long totalCount = 0; //donorService.getDonorsCount(filterDescs);
 
         return createEntityListResponse(data, totalCount, limit, offset, null);
     }
@@ -51,7 +53,7 @@ public class JobExecutionEndpoint extends AbstractEndpoint {
     @Produces(MediaType.APPLICATION_JSON)
     public Response delete(@PathParam("id") Integer id) {
 
-        com.company.jersey04.models.JobExecution data = donorService.getDonor(id);
+        JobExecution data = null;//donorService.getDonor(id);
 
         return createDeleteResponse(data, null);
     }
