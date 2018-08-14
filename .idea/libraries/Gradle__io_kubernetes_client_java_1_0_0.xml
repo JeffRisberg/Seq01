@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: io.kubernetes:client-java:1.0.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.kubernetes/client-java/1.0.0/4bf42473e37aab25ec95ba6095dd26ea6a132c01/client-java-1.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.kubernetes/client-java/1.0.0/5fa6edbde54b43efd00d7d52b5afccfe139498e6/client-java-1.0.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
