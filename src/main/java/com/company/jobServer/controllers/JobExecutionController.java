@@ -4,7 +4,6 @@ import com.company.jobServer.beans.JobExecution;
 import com.company.jobServer.beans.JobExecutionState;
 import com.company.jobServer.beans.enums.JobStatus;
 import com.company.jobServer.controllers.DAO.JobExecutionDAO;
-import com.company.jobServer.controllers.DAO.JobExecutionStateDAO;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
