@@ -73,21 +73,6 @@ public class JobExecutions {
     }
   }
 
-  @Path("{handle}/job-execution-states")
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @ApiOperation(value = "Get JobExecutionStates by handle", response = JobExecutionState.class, responseContainer = "List")
-  public Response getJobExecutionStatesByHandle(@PathParam("handle") String handle) {
-    try {
-      List<JobExecutionState> jobExecutionStates = jobExecutionController.getJobExecutionStatesByHandle(handle);
-
-      return Response.ok(jobExecutionStates).build();
-    } catch (Exception e) {
-      log.error("Exception during request", e);
-      return Response.serverError().entity(RestTools.getErrorJson("Exception during request", false, Optional.of(e))).build();
-    }
-  }
-
   @Path("/{id}")
   @DELETE
   @Produces(MediaType.APPLICATION_JSON)

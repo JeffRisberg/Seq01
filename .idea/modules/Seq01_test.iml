@@ -55,6 +55,7 @@
     <orderEntry type="library" name="Gradle: org.glassfish.hk2:hk2:2.5.0-b44" level="project" />
     <orderEntry type="library" name="Gradle: org.hibernate:hibernate-c3p0:5.2.11.Final" level="project" />
     <orderEntry type="library" name="Gradle: org.hibernate:hibernate-core:5.2.11.Final" level="project" />
+    <orderEntry type="library" name="Gradle: org.mariadb.jdbc:mariadb-java-client:2.1.2" level="project" />
     <orderEntry type="library" name="Gradle: mysql:mysql-connector-java:5.1.45" level="project" />
     <orderEntry type="library" name="Gradle: junit:junit:4.12" level="project" />
     <orderEntry type="library" name="Gradle: javax.servlet:javax.servlet-api:3.1.0" level="project" />

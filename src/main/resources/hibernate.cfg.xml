@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+  "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+  "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+  <session-factory>
+    <property name="hibernate.connection.driver_class">org.mariadb.jdbc.Driver</property>
+    <property name="hibernate.dialect">org.hibernate.dialect.MariaDBDialect</property>
+    <property name="validationQuery">select 1</property>
+    <property name="connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
+    <property name="hibernate.c3p0.acquire_increment">1</property>
+    <property name="hibernate.c3p0.idle_test_period">100</property>
+    <property name="hibernate.c3p0.max_size">100</property>
+    <property name="hibernate.c3p0.max_statements">100</property>
+    <property name="hibernate.c3p0.min_size">10</property>
+    <property name="hibernate.c3p0.timeout">180</property>
+    <property name="hibernate.show_sql">true</property>
+
+    <mapping class="com.company.jobServer.beans.DAGNode"/>
+    <mapping class="com.company.jobServer.beans.DAGNodeDependency"/>
+    <mapping class="com.company.jobServer.beans.DAGNodeExecution"/>
+    <mapping class="com.company.jobServer.beans.Job"/>
+    <mapping class="com.company.jobServer.beans.JobExecution"/>
+    <mapping class="com.company.jobServer.beans.JobExecutionSummary"/>
+    <mapping class="com.company.jobServer.beans.JobExecutionState"/>
+    <mapping class="com.company.jobServer.beans.JobExecutionStep"/>
+  </session-factory>
+</hibernate-configuration>

@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: entity-score-job
+  namespace: default
+spec:
+  containers:
+  - args:
+    command:
+    env:
+    - name: aisera_pubsub_host_ports
+      value: aisera-pubsub-kafka-0.aisera-pubsub-kafka-headless.default.svc.cluster.local:9092,aisera-pubsub-kafka-1.aisera-pubsub-kafka-headless.default.svc.cluster.local:9092,aisera-pubsub-kafka-2.aisera-pubsub-kafka-headless.default.svc.cluster.local:9092
+    - name: aisera_io_python_pubsub_plugin
+      value: redis
+    - name: aisera_config
+      value: '{"output-bucket":"aiseratenants-dev2","output-path":"10000/ModelStore/entity-score-model/temp","input-bucket":"aiseratenants-dev2","input-path":"10000/RawData/Incidents","tenant-id":"10000","recency-hour":"10000"}'
+    - name: aisera_connector_config
+      value: '{"output-bucket":"aiseratenants-dev2","output-path":"10000/ModelStore/entity-score-model/temp","input-bucket":"aiseratenants-dev2","input-path":"10000/RawData/Incidents","tenant-id":"10000","recency-hour":"10000"}'
+    - name: aisera_training_input_config
+      value: '{"output-bucket":"aiseratenants-dev2","output-path":"10000/ModelStore/entity-score-model/temp","input-bucket":"aiseratenants-dev2","input-path":"10000/RawData/Incidents","tenant-id":"10000","recency-hour":"10000"}'
+    - name: aisera_deployment_handle
+      value: entity-score-job-1530497394887-73
+    - name: aisera_kv_redis_host
+      value: redis
+    - name: aisera_sql_user
+      value: root
+    - name: aisera_datastores_sql_host
+      value: mariadb
+    - name: aisera_datastores_sql_port
+      value: "3306"
+    - name: aisera_training_hyperparams
+      value: '{}'
+    - name: aisera_sql_password
+      value: rootroot
+    envFrom:
+    - configMapRef:
+        name: aisera-config
+    - secretRef:
+        name: aisera-secrets
+    image: 934101271236.dkr.ecr.us-west-2.amazonaws.com/entity-scores-model:Milestone_8.1
+    imagePullPolicy: Always
+    name: entity-score-job
+  restartPolicy: Never

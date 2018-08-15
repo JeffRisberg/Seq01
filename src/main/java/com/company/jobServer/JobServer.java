@@ -36,7 +36,7 @@ public class JobServer {
     public final static String DB_PASSWORD = "company_sql_password";
 
     public final static String DEFAULT_JOB_SERVER_PORT = "8087";
-    public final static String DEFAULT_DB_HOST = "mariadb";
+    public final static String DEFAULT_DB_HOST = "localhost";
     public final static String DEFAULT_DB_PORT = "3306";
     public final static String DEFAULT_DB_USER = "root";
     public final static String DEFAULT_DB_PASSWORD = "rootroot";

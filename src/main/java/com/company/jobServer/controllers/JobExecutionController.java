@@ -16,7 +16,6 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class JobExecutionController extends BaseController {
   private static JobExecutionDAO dao = new JobExecutionDAO();
-  private static JobExecutionStateDAO stateDAO = new JobExecutionStateDAO();
 
   public JobExecution getById(Long id) throws Exception {
     final AtomicReference<JobExecution> td = new AtomicReference<>();
@@ -68,13 +67,6 @@ public class JobExecutionController extends BaseController {
       deployment_endtime = jobExecutionState.getStateDatetime();
     }
 
-    if (dao.updateByState(jobExecutionState, deployment_endtime)) {
-      final AtomicReference<JobExecutionState> response = new AtomicReference<>();
-      doWork(session -> response.set(stateDAO.create(jobExecutionState, session)));
-      JobExecutionState newJobExecutionState = response.get();
-      if (newJobExecutionState != null)
-        return true;
-    }
     return false;
     } catch (Exception e) {
       e.printStackTrace();
@@ -88,17 +80,6 @@ public class JobExecutionController extends BaseController {
       Timestamp endtime = new Timestamp(System.currentTimeMillis());
       dao.updateById(jobExecution, jobStatus, endtime);
       return getById(jobExecution.getId());
-    } catch (Exception e) {
-      e.printStackTrace();
-      return null;
-    }
-  }
-
-  public List<JobExecutionState> getJobExecutionStatesByHandle(String handle) {
-    try {
-      final AtomicReference<List<JobExecutionState>> response = new AtomicReference<>();
-      doWork(session -> response.set(stateDAO.getByHandle(handle, session)));
-      return response.get();
     } catch (Exception e) {
       e.printStackTrace();
       return null;
