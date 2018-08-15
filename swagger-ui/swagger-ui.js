@@ -5664,7 +5664,7 @@ module.exports.schemaToHTML =function (name, schema, models, modelPropertyMacro)
     return strongOpen + 'Empty' + strongClose;
   }
 
-  // Dereference $ref from 'models'
+  // Dereference $ref from 'beans'
   if(typeof schema.$ref === 'string') {
     name = Helpers.simpleRef(schema.$ref);
     schema = models[name];
@@ -6781,7 +6781,7 @@ var Operation = module.exports = function (parent, scheme, operationId, httpMeth
   var i, model;
 
   if (definitions) {
-    // add to global models
+    // add to global beans
     for (key in definitions) {
       model = new Model(key, definitions[key], this.models, parent.modelPropertyMacro);
 
@@ -24258,7 +24258,7 @@ SwaggerUi.partials.signature = (function () {
       return strongOpen + 'Empty' + strongClose;
     }
 
-    // Dereference $ref from 'models'
+    // Dereference $ref from 'beans'
     if(typeof schema.$ref === 'string') {
       name = simpleRef(schema.$ref);
       schema = models[name];

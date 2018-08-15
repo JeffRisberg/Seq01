@@ -1,0 +1,17 @@
+#!/bin/bash
+# This is the init script for the Server daemon.
+# When deployed, it should be placed under /etc/init.d/
+# to be executed as a service.
+
+SERVER_HOME=/opt/job_server
+
+LIB_DIR=$SERVER_HOME/lib
+CONF_DIR=$SERVER_HOME/conf
+
+CLASSPATH=$CONF_DIR
+CLASSPATH=$CLASSPATH:$(echo $LIB_DIR/*.jar | tr ' ' ':')
+
+LOG_FILE_PATH=/var/log/job-server.log
+
+cd $SERVER_HOME
+java -Duser.dir=$SERVER_HOME -Dname=job-server -cp $CLASSPATH  com.aisera.jobManager.JobServer
