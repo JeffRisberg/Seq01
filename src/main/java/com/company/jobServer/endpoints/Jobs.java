@@ -210,77 +210,6 @@ public class Jobs {
         }
     }
 
-    @Path("/{jobId}/action")
-    @PUT
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Modifies the state of a Job", response = JobExecution.class)
-    public Response modifyJobState(@PathParam("jobId") long jobId, JobStateAction action) {
-        log.info("ModifyJobState jobId=" + jobId + ", action=" + action.getAction());
-
-        try {
-            Job job = jobController.getById(jobId);
-            if (job == null) {
-                log.error("Unknown Job");
-                return Response.ok(new ArrayList<>()).build();
-            }
-
-            JobExecution jobExecution = new JobExecution();
-
-            switch (action.getAction()) {
-                case JobStateAction.PAUSE_ACTION:
-                    return Response.ok().build();
-                case JobStateAction.RESUME_ACTION:
-                    return Response.ok().build();
-                case JobStateAction.STOP_ACTION:
-                    if (job.getJobType() == JobType.CONNECTOR) {
-                        List<JobExecution> jobExecutions = jobExecutionController.getByJobId(jobId);
-                        for (JobExecution je : jobExecutions) {
-                            connectorJobExecutor.stop(je, true);
-                        }
-                    }
-                    System.out.println("stop action");
-                    return null; // this.stopJob(all);
-                case JobStateAction.START_ACTION:
-                    System.out.println("start action job name:" + job.getName() + " type:" + job.getJobType() + " computeResource:" + job.getComputeResource());
-
-                    if (job.getName().contains("_dag")) {
-                        log.info("Starting to make call to Airflow");
-                        log.info("DAG name is: " + job.getDescription());
-                        /*
-                        String dagName = job.getDescription();
-                        if (dagName == null || dagName.isEmpty())
-                            dagName = "tutorial";
-                        //String dagName = "full_major_incident_dag_" + job.getTenantId();
-
-                        AirflowClient airflowClient = new AirflowClient();
-                        AirflowResponseDto resp = airflowClient.triggerAirflowDAG(dagName, job.getTenantId(), job.getReferenceId());
-                        log.info("Response from Airflow: -->");
-                        log.info(resp.toString());
-                        if (resp.getHttp_response_code() != 200) {
-                            log.error("Error in calling Airflow. Response code:" + resp.getHttp_response_code());
-                        }
-                        */
-                    } else {
-                        if (job.getJobType() == JobType.CONNECTOR) {
-                            jobExecution = connectorJobExecutor.start(job, null);
-                        } else if (job.getJobType() == JobType.MODEL) {
-                            jobExecution = modelJobExecutor.start(job, null);
-                        } else if (job.getJobType() == JobType.COLLECTION) {
-                            jobExecution = collectionJobExecutor.start(job, null);
-                        } else {
-                            log.error("Unknown JobType " + job.getJobType());
-                        }
-                    }
-                    return Response.ok(jobExecution).build();
-                default:
-                    return Response.status(Response.Status.BAD_REQUEST).build();
-            }
-        } catch (Exception e) {
-            return Response.serverError().entity(RestTools.getErrorJson("Exception during request", false, Optional.of(e))).build();
-        }
-    }
-
     @Path("/{jobId}/job-executions")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -327,8 +256,6 @@ public class Jobs {
             job1.setName("main-" + tenantId);
             job1.setReferenceId("main-" + tenantId);
 
-            //JSONObject env1 = new JSONObject();
-            //job1.setRuntimeParams(env1);
             Job createdJob1 = jobController.create(job1);
             DAGNode dagNode1 = new DAGNode();
             dagNode1.setName(generateUniqueName("node1"));

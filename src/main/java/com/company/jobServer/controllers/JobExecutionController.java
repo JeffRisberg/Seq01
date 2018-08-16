@@ -1,7 +1,6 @@
 package com.company.jobServer.controllers;
 
 import com.company.jobServer.beans.JobExecution;
-import com.company.jobServer.beans.JobExecutionState;
 import com.company.jobServer.beans.enums.JobStatus;
 import com.company.jobServer.controllers.DAO.JobExecutionDAO;
 
@@ -57,32 +56,5 @@ public class JobExecutionController extends BaseController {
     String sql = "SELECT * FROM job_executions WHERE job_id=:jobId";
     doWork(session -> response.set(dao.getBySQL(JobExecution.class, sql, params, session)));
     return response.get();
-  }
-
-  public boolean updateState(JobExecutionState jobExecutionState) {
-    try {
-    Timestamp deployment_endtime = null;
-    JobStatus status = jobExecutionState.getState();
-    if (status == JobStatus.FAILED || status == JobStatus.SUCCEEDED) {
-      deployment_endtime = jobExecutionState.getStateDatetime();
-    }
-
-    return false;
-    } catch (Exception e) {
-      e.printStackTrace();
-      return false;
-    }
-  }
-
-  public JobExecution updateFinalStatus(JobExecution jobExecution, JobStatus jobStatus) {
-    try {
-      final AtomicReference<JobExecutionState> response = new AtomicReference<>();
-      Timestamp endtime = new Timestamp(System.currentTimeMillis());
-      dao.updateById(jobExecution, jobStatus, endtime);
-      return getById(jobExecution.getId());
-    } catch (Exception e) {
-      e.printStackTrace();
-      return null;
-    }
   }
 }

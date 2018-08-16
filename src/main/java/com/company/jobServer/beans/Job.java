@@ -75,6 +75,11 @@ public class Job extends AbstractDatabaseItem {
   @ApiModelProperty(value = "Cron schedule string")
   private String cronSchedule = null; // applies only for scheduleType="CRON"
 
+  @Convert(converter = JpaConverterJson.class)
+  @Column(name = "env_vars")
+  @ApiModelProperty(required = true, value = "JSON Object of params to pass in at startup")
+  private JSONObject envVars;
+
   @Column(name = "hyper_parameters")
   @Convert(converter = JpaConverterJson.class)
   @ApiModelProperty(value = "Hyper-Parameters")

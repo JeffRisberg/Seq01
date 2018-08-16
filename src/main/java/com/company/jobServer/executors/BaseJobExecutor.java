@@ -1,17 +1,15 @@
 package com.company.jobServer.executors;
 
+import com.company.jobServer.JobServer;
 import com.company.jobServer.beans.Job;
 import com.company.jobServer.beans.JobExecution;
-import com.company.jobServer.beans.JobExecutionState;
-import com.company.jobServer.beans.JobExecutionSummary;
 import com.company.jobServer.beans.enums.JobStatus;
 import com.company.jobServer.common.ResourceLocator;
 import com.company.jobServer.common.orchestration.DeployableObject;
 import com.company.jobServer.common.orchestration.DeploymentHandle;
 import com.company.jobServer.common.orchestration.ExecutionType;
 import com.company.jobServer.controllers.JobExecutionController;
-import com.company.jobServer.controllers.JobExecutionStateController;
-import com.company.jobServer.controllers.JobExecutionSummaryController;
+import com.company.jobServer.services.JobLaunchService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -19,6 +17,8 @@ import org.json.simple.JSONObject;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class BaseJobExecutor implements IJobExecutor {
@@ -28,14 +28,17 @@ public class BaseJobExecutor implements IJobExecutor {
     protected final ObjectMapper mapper = new ObjectMapper();
 
     static JobExecutionController jobExecutionController = new JobExecutionController();
-    static JobExecutionStateController jobExecutionStateController = new JobExecutionStateController();
-    static JobExecutionSummaryController jobExecutionSummaryController = new JobExecutionSummaryController();
+    static JobLaunchService jobLaunchService = new JobLaunchService();
 
     @Override
-    public JobExecution start(Job job, JSONObject runtimeParams) {
+    public JobExecution start(Job job, JSONObject envVars) {
         log.info("startJob " + job.getId() + " " + job.getName());
 
         try {
+            JSONObject effectiveEnvVars = new JSONObject();
+            effectiveEnvVars.putAll(job.getEnvVars());
+            effectiveEnvVars.putAll(envVars);
+
             Timestamp deploymentStartDatetime = new Timestamp(new Date().getTime());
             JobExecution jobExecution = new JobExecution();
 
@@ -45,6 +48,8 @@ public class BaseJobExecutor implements IJobExecutor {
             jobExecution.setJob(job);
             jobExecution.setJobId(job.getId());
             jobExecution.setHandleData("{}");
+            jobExecution.setEnvVars(envVars);
+            jobExecution.setEffectiveEnvVars(effectiveEnvVars);
             jobExecution.setStatus(JobStatus.PENDING);
             jobExecution.setTenantId(job.getTenantId());
             jobExecution.setStartedAt(deploymentStartDatetime);
@@ -73,53 +78,33 @@ public class BaseJobExecutor implements IJobExecutor {
                     deployableObject.setCronSchedule(job.getCronSchedule());
                 }
 
-                deployableObject.setInputParams(mapper.writeValueAsString(runtimeParams));
+                deployableObject.setInputParams(mapper.writeValueAsString(effectiveEnvVars));
 
                 this.setupEnv(job, deployableObject);
 
                 log.info("about to launch " + deployableObject);
 
-                DeploymentHandle handle = null;// JobServer.containerService.launchDeployment(deployableObject);
+                DeploymentHandle handle = jobLaunchService.launchJob(job, jobExecution);
+
                 jobExecution.setDeploymentHandle(handle.getName());
                 jobExecution.setHandleData(mapper.writeValueAsString(handle));
                 jobExecution.setOutputLocation(job.getOutputModel());
 
-                /*
+
                 CompletionChecker completionChecker = new CompletionChecker(jobExecution, handle);
 
                 ScheduledFuture<?> future = JobServer.executor.scheduleAtFixedRate
                         (completionChecker, 30, 30, TimeUnit.SECONDS);
 
                 JobServer.currentTimers.put(jobExecution.getDeploymentHandle(), future);
-                */
 
             } catch (Exception e) {
                 log.error("Exception during deployment launch", e);
             }
 
             JobExecution createdJobExecution = jobExecutionController.create(jobExecution);
-            if (createdJobExecution != null) {
-                JobExecutionState jobExecutionState = new JobExecutionState();
-                jobExecutionState.setHandle(createdJobExecution.getDeploymentHandle());
-                jobExecutionState.setStateDatetime(createdJobExecution.getStartedAt());
-                jobExecutionState.setStateInfo(mapper.readValue("{}", JSONObject.class));
-                jobExecutionState.setState(createdJobExecution.getStatus());
 
-                if (jobExecutionState.getHandle() != null) {
-                    jobExecutionStateController.create(jobExecutionState);
-                }
-
-                JobExecutionSummary jobExecutionSummary = new JobExecutionSummary();
-                jobExecutionSummary.setJobId(job.getId());
-                jobExecutionSummary.setHandle(createdJobExecution.getDeploymentHandle());
-                jobExecutionSummary.setStartDatetime(createdJobExecution.getStartedAt());
-                jobExecutionSummary.setEndDatetime(createdJobExecution.getStartedAt());
-                jobExecutionSummaryController.create(jobExecutionSummary);
-            } else {
-                log.error("createdJobExecution was null");
-            }
-
-            return jobExecution;
+            return createdJobExecution;
         } catch (Exception e) {
             log.error("Exception in startJob", e);
             return null;

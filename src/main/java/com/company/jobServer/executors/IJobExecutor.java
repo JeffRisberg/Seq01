@@ -7,7 +7,7 @@ import org.json.simple.JSONObject;
 
 public interface IJobExecutor {
 
-  public JobExecution start(Job job, JSONObject runtimeParams);
+  public JobExecution start(Job job, JSONObject envVars);
 
   public void setupEnv(Job job, DeployableObject deployableObject);
 

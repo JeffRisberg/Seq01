@@ -9,8 +9,8 @@ import org.json.simple.JSONObject;
 public class CollectionJobExecutor extends BaseJobExecutor {
 
   @Override
-  public JobExecution start(Job job, JSONObject runtimeParams) {
-    return super.start(job, runtimeParams);
+  public JobExecution start(Job job, JSONObject envVars) {
+    return super.start(job, envVars);
   }
 
   @Override

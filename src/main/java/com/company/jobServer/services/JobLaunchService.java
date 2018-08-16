@@ -1,7 +1,19 @@
 package com.company.jobServer.services;
 
+import com.company.jobServer.beans.Job;
+import com.company.jobServer.beans.JobExecution;
 import com.company.jobServer.common.orchestration.DeployableObject;
+import com.company.jobServer.common.orchestration.DeploymentHandle;
+import com.company.jobServer.common.orchestration.DeploymentHandleDTO;
+import com.company.jobServer.common.orchestration.ExecutionType;
+import com.squareup.okhttp.Credentials;
+import io.kubernetes.client.ApiClient;
+import io.kubernetes.client.Configuration;
+import io.kubernetes.client.apis.BatchV1Api;
+import io.kubernetes.client.auth.ApiKeyAuth;
+import io.kubernetes.client.auth.HttpBasicAuth;
 import io.kubernetes.client.models.*;
+import io.kubernetes.client.util.Config;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +24,52 @@ public class JobLaunchService {
 
     static Random random = new Random();
 
-    public JobLaunchService() throws Exception {
+    public JobLaunchService() {
+    }
+
+    public DeploymentHandle launchJob(Job job, JobExecution jobExecution) {
+        try {
+            String configFile = "/Users/jeff/.kube/config";
+            ApiClient client = Config.fromConfig(configFile);
+
+            ApiKeyAuth BearerToken = (ApiKeyAuth) client.getAuthentication("BearerToken");
+
+            if (BearerToken.getApiKey() == null) {
+                System.out.println("Setting up AppKey");
+
+                BearerToken.setApiKey(Credentials.basic(
+                        ((HttpBasicAuth) client.getAuthentications().get("BasicAuth")).getUsername(),
+                        ((HttpBasicAuth) client.getAuthentications().get("BasicAuth")).getPassword()));
+            }
+            client.setDebugging(true);
+            Configuration.setDefaultApiClient(client);
+
+            String namespace = "default";
+            String pretty = "TRUE";
+
+            BatchV1Api batchV1Api = new BatchV1Api();
+
+            DeployableObject deployableObject = new DeployableObject();
+            deployableObject.setNamespace(namespace);
+            deployableObject.setDockerContainerName(job.getDockerImageName());
+            deployableObject.setDeploymentType(ExecutionType.Job);
+            deployableObject.setName(job.getName());
+            deployableObject.setEnv(jobExecution.getEffectiveEnvVars());
+
+            V1Job v1Job = createJob(deployableObject);
+
+            batchV1Api.createNamespacedJob(deployableObject.getNamespace(), v1Job, pretty);
+
+            DeploymentHandle deploymentHandle = new DeploymentHandleDTO();
+            deploymentHandle.setName(job.getName());
+            deploymentHandle.setNamespace(namespace);
+
+            return deploymentHandle;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private V1Job createJob(DeployableObject deployableObject) {
@@ -123,45 +180,4 @@ public class JobLaunchService {
     private String generateUniqueName(String name) {
         return name + "-" + System.currentTimeMillis() + "-" + random.nextInt(99);
     }
-
-    /*
-    public static void main(String[] args) throws IOException, ApiException {
-
-        String configFile = "/Users/jeff/.kube/config";
-        ApiClient client = Config.fromConfig(configFile);
-
-        ApiKeyAuth BearerToken = (ApiKeyAuth) client.getAuthentication("BearerToken");
-
-        if (BearerToken.getApiKey() == null) {
-            System.out.println("Setting up AppKey");
-
-            BearerToken.setApiKey(Credentials.basic(
-                    ((HttpBasicAuth) client.getAuthentications().get("BasicAuth")).getUsername(),
-                    ((HttpBasicAuth) client.getAuthentications().get("BasicAuth")).getPassword()));
-        }
-        client.setDebugging(true);
-        Configuration.setDefaultApiClient(client);
-
-        try {
-            String namespace = "default";
-            String pretty = "TRUE";
-
-            LaunchExample launchExample = new LaunchExample();
-            BatchV1Api batchV1Api = new BatchV1Api();
-
-            DeployableObject deployableObject = new DeployableObject();
-            deployableObject.setNamespace(namespace);
-            deployableObject.setDockerContainerName("gcr.io/kuar-demo/kuard-amd64:1");
-            deployableObject.setDeploymentType(ExecutionType.Job);
-            deployableObject.setName("kuard");
-
-            V1Job job = launchExample.createJob(deployableObject);
-
-            batchV1Api.createNamespacedJob(deployableObject.getNamespace(), job, pretty);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    */
 }

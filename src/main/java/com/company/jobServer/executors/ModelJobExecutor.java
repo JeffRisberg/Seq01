@@ -27,7 +27,7 @@ public class ModelJobExecutor extends BaseJobExecutor {
     public static JSONParser jsonParser = new JSONParser();
 
     @Override
-    public JobExecution start(Job job, JSONObject runtimeParams) {
+    public JobExecution start(Job job, JSONObject envVars) {
         /*
         ModelClient modelClient = new ModelClient();
 
@@ -93,7 +93,7 @@ public class ModelJobExecutor extends BaseJobExecutor {
         }
         */
 
-        return super.start(job, runtimeParams);
+        return super.start(job, envVars);
     }
 
     @Override

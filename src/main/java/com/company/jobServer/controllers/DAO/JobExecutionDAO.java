@@ -2,7 +2,6 @@ package com.company.jobServer.controllers.DAO;
 
 import com.company.jobServer.JobServer;
 import com.company.jobServer.beans.JobExecution;
-import com.company.jobServer.beans.JobExecutionState;
 import com.company.jobServer.beans.enums.JobStatus;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +33,7 @@ public class JobExecutionDAO extends BaseDAOImpl {
     return super.deleteById(JobExecution.class, id, session);
   }
 
+  /*
   public boolean updateByState(JobExecutionState jobExecutionState, Timestamp endDateTime) {
     Session session = null;
     Transaction tx = null;
@@ -58,6 +58,7 @@ public class JobExecutionDAO extends BaseDAOImpl {
       return false;
     }
   }
+  */
 
   public boolean updateById(JobExecution jobExecution, JobStatus jobStatus, Timestamp endDateTime) {
     Session session = null;
