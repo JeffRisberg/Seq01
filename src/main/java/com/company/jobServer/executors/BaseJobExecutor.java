@@ -39,8 +39,11 @@ public class BaseJobExecutor implements IJobExecutor {
             effectiveEnvVars.putAll(job.getEnvVars());
             effectiveEnvVars.putAll(envVars);
 
+            System.out.println("effectiveEnvVars:  "+ effectiveEnvVars);
+
             Timestamp deploymentStartDatetime = new Timestamp(new Date().getTime());
             JobExecution jobExecution = new JobExecution();
+            jobExecution.setCreatedAt(new Timestamp(System.currentTimeMillis()));
 
             // Add placeholder handle, if Kubernetes launches successfully it will be replaced with proper handle
             jobExecution.setDeploymentHandle("placeholder-handle-" + deploymentStartDatetime.toString()
