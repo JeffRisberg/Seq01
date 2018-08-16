@@ -22,8 +22,5 @@
     <mapping class="com.company.jobServer.beans.DAGNodeExecution"/>
     <mapping class="com.company.jobServer.beans.Job"/>
     <mapping class="com.company.jobServer.beans.JobExecution"/>
-    <mapping class="com.company.jobServer.beans.JobExecutionSummary"/>
-    <mapping class="com.company.jobServer.beans.JobExecutionState"/>
-    <mapping class="com.company.jobServer.beans.JobExecutionStep"/>
   </session-factory>
 </hibernate-configuration>

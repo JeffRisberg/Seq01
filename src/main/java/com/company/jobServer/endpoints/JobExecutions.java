@@ -49,6 +49,8 @@ public class JobExecutions {
 
             JSONObject envVars = (JSONObject) parser.parse(requestBody);
 
+            System.out.println("Env Vars " + envVars);
+
             ConnectorJobExecutor jobExecutor = new ConnectorJobExecutor();
 
             JobExecution jobExecution = jobExecutor.start(job, envVars);
