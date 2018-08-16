@@ -31,7 +31,7 @@ public class DAGNodeExecution extends AbstractDatabaseItem {
   @ApiModelProperty(required = true, value = "Foreign key to dag node")
   private Long dagNodeId;
 
-  @ApiModelProperty(value = "Status of the DagNodeJob")
+  @ApiModelProperty(value = "ExecutionStatus of the DagNodeJob")
   @Enumerated(EnumType.STRING)
   private JobStatus status;
 

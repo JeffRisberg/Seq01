@@ -24,5 +24,5 @@ public class DeployableObject {
   private HashMap<String, String> env;
   private List<String> command;
   private List<String> args;
-  private DeploymentType deploymentType;
+  private ExecutionType deploymentType;
 }

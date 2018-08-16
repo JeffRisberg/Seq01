@@ -152,7 +152,7 @@ public class JobLaunchService {
             DeployableObject deployableObject = new DeployableObject();
             deployableObject.setNamespace(namespace);
             deployableObject.setDockerContainerName("gcr.io/kuar-demo/kuard-amd64:1");
-            deployableObject.setDeploymentType(DeploymentType.Job);
+            deployableObject.setDeploymentType(ExecutionType.Job);
             deployableObject.setName("kuard");
 
             V1Job job = launchExample.createJob(deployableObject);

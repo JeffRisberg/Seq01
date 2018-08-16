@@ -1,12 +1,13 @@
 package com.company.jobServer.beans;
 
-import com.company.jobServer.common.orchestration.DeploymentType;
+import com.company.jobServer.common.orchestration.ExecutionType;
 import com.company.jobServer.beans.enums.JobStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.json.simple.JSONObject;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -36,17 +37,18 @@ public class JobExecution extends AbstractDatabaseItem {
   @ApiModelProperty(value = "Tenant Id")
   private String tenantId;
 
-  @Column(name = "namespace")
-  @ApiModelProperty(value = "Namespace")
-  private String namespace;
-
   @Column(name = "deployment_type")
-  @ApiModelProperty(value = "DeploymentType")
-  private DeploymentType deploymentType;
+  @ApiModelProperty(value = "ExecutionType")
+  private ExecutionType deploymentType;
 
-  @Column(name = "input_parameters")
-  @ApiModelProperty(value = "JSON string containing input parameters")
-  private String inputParameters = null;
+  @Convert(converter = JpaConverterJson.class)
+  @Column(name = "runtime_params")
+  @ApiModelProperty(required = true, value = "JSON Object of params to pass in at startup")
+  private JSONObject runtimeParams;
+
+  @Column(name = "last_update", insertable = false, updatable = false)
+  @ApiModelProperty(required = false, value = "Time of last Execution start. Assigned by framework")
+  private Timestamp lastUpdate;
 
   @Column(name = "deployment_handle")
   @ApiModelProperty(value = "Deployment handle") // Contains name of handle
@@ -58,20 +60,16 @@ public class JobExecution extends AbstractDatabaseItem {
 
   @Column(name = "status")
   @Enumerated(EnumType.STRING)
-  @ApiModelProperty(value = "Status of the Job")
+  @ApiModelProperty(value = "ExecutionStatus of the JobExecution")
   private JobStatus status;
 
   @Column(name = "started_at")
-  @ApiModelProperty(value = "Job start time")
+  @ApiModelProperty(value = "JobExecution start time")
   private Timestamp startedAt;
 
   @Column(name = "stopped_at")
-  @ApiModelProperty(value = "Job end time")
+  @ApiModelProperty(value = "JobExecution end time")
   private Timestamp stoppedAt;
-
-  @Column(name = "numReplicas")
-  @ApiModelProperty(value = "Number of pod replicas running at any time. Cannot be specified if Autoscaler is enabled. Minimum value: 0")
-  private Long numReplicas = null;
 
   @Column(name = "output_location")
   @ApiModelProperty(value = "OutputLocation for this execution")

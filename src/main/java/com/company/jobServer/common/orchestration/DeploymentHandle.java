@@ -14,9 +14,9 @@ public interface DeploymentHandle {
 
   public void setUUID(String UUID);
 
-  public DeploymentType getDeploymentType();
+  public ExecutionType getDeploymentType();
 
-  public void setDeploymentType(DeploymentType deploymentType);
+  public void setDeploymentType(ExecutionType deploymentType);
 
   public String getContainerService();
 

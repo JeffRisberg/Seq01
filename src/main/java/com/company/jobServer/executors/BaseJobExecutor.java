@@ -1,6 +1,5 @@
 package com.company.jobServer.executors;
 
-import com.company.jobServer.JobServer;
 import com.company.jobServer.beans.Job;
 import com.company.jobServer.beans.JobExecution;
 import com.company.jobServer.beans.JobExecutionState;
@@ -9,7 +8,7 @@ import com.company.jobServer.beans.enums.JobStatus;
 import com.company.jobServer.common.ResourceLocator;
 import com.company.jobServer.common.orchestration.DeployableObject;
 import com.company.jobServer.common.orchestration.DeploymentHandle;
-import com.company.jobServer.common.orchestration.DeploymentType;
+import com.company.jobServer.common.orchestration.ExecutionType;
 import com.company.jobServer.controllers.JobExecutionController;
 import com.company.jobServer.controllers.JobExecutionStateController;
 import com.company.jobServer.controllers.JobExecutionSummaryController;
@@ -20,8 +19,6 @@ import org.json.simple.JSONObject;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class BaseJobExecutor implements IJobExecutor {
@@ -35,7 +32,7 @@ public class BaseJobExecutor implements IJobExecutor {
     static JobExecutionSummaryController jobExecutionSummaryController = new JobExecutionSummaryController();
 
     @Override
-    public JobExecution start(Job job) {
+    public JobExecution start(Job job, JSONObject runtimeParams) {
         log.info("startJob " + job.getId() + " " + job.getName());
 
         try {
@@ -51,8 +48,7 @@ public class BaseJobExecutor implements IJobExecutor {
             jobExecution.setStatus(JobStatus.PENDING);
             jobExecution.setTenantId(job.getTenantId());
             jobExecution.setStartedAt(deploymentStartDatetime);
-            jobExecution.setDeploymentType(DeploymentType.Job);
-            jobExecution.setNamespace("default");
+            jobExecution.setDeploymentType(ExecutionType.Job);
 
             try {
                 String imageTag = ResourceLocator.getResource(DOCKER_IMAGE_TAG).orElse(DEFAULT_DOCKER_IMAGE_TAG);
@@ -71,13 +67,13 @@ public class BaseJobExecutor implements IJobExecutor {
                 deployableObject.setDescription(job.getName());
 
                 if (job.getCronSchedule() == null || job.getCronSchedule().isEmpty() || job.getCronSchedule().equals("string"))
-                    deployableObject.setDeploymentType(DeploymentType.Job);
+                    deployableObject.setDeploymentType(ExecutionType.Job);
                 else {
-                    deployableObject.setDeploymentType(DeploymentType.CronJob);
+                    deployableObject.setDeploymentType(ExecutionType.CronJob);
                     deployableObject.setCronSchedule(job.getCronSchedule());
                 }
 
-                deployableObject.setInputParams(mapper.writeValueAsString(job.getRuntimeParams()));
+                deployableObject.setInputParams(mapper.writeValueAsString(runtimeParams));
 
                 this.setupEnv(job, deployableObject);
 

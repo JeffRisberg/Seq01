@@ -4,7 +4,7 @@ public class DeploymentHandleDTO implements DeploymentHandle {
   private String namespace;
   private String name;
   private String uuid;
-  private DeploymentType deploymentType = DeploymentType.CronJob;
+  private ExecutionType deploymentType = ExecutionType.CronJob;
   private String containerService;
   private String internalEndpoint;
   private String externalEndpoint;
@@ -38,12 +38,12 @@ public class DeploymentHandleDTO implements DeploymentHandle {
   }
 
   @Override
-  public DeploymentType getDeploymentType() {
+  public ExecutionType getDeploymentType() {
     return deploymentType;
   }
 
   @Override
-  public void setDeploymentType(DeploymentType deploymentType) {
+  public void setDeploymentType(ExecutionType deploymentType) {
     this.deploymentType = deploymentType;
   }
 

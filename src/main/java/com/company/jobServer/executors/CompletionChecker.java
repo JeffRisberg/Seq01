@@ -5,7 +5,7 @@ import com.company.jobServer.beans.Job;
 import com.company.jobServer.beans.JobExecution;
 import com.company.jobServer.beans.enums.JobType;
 import com.company.jobServer.common.orchestration.DeploymentHandle;
-import com.company.jobServer.common.orchestration.Status;
+import com.company.jobServer.common.orchestration.ExecutionStatus;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.Future;
@@ -24,11 +24,11 @@ public class CompletionChecker implements Runnable {
   @Override
   public void run() {
     try {
-      Status status = null;// JobServer.containerService.getDeploymentStatus(handle);
+      ExecutionStatus status = null;// JobServer.containerService.getDeploymentStatus(handle);
 
       log.info("status on " + handle.getName() + " is " + status);
 
-      if (status != Status.Pending && status != Status.Running) {
+      if (status != ExecutionStatus.Pending && status != ExecutionStatus.Running) {
         log.info("handle " + handle.getName() + " has finished");
 
         Job job = jobExecution.getJob();

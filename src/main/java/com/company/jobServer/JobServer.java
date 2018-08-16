@@ -62,22 +62,22 @@ public class JobServer {
         connector.setPort(plainPort);
         server.setConnectors(new Connector[]{connector});
 
-        ServletContextHandler context = new ServletContextHandler(server, "/job-server", ServletContextHandler.SESSIONS);
+        ServletContextHandler sch = new ServletContextHandler(server, "/job-server", ServletContextHandler.SESSIONS);
 
         ServletHolder mainServlet = new ServletHolder(org.glassfish.jersey.servlet.ServletContainer.class);
         mainServlet.setInitParameter(ServletProperties.JAXRS_APPLICATION_CLASS, JobServerConfig.class.getCanonicalName());
         mainServlet.setInitOrder(1);
-        context.addServlet(mainServlet, "/*");
+        sch.addServlet(mainServlet, "/*");
 
-        ServletHolder swaggerServlet = new ServletHolder(DefaultJaxrsConfig.class);
-        swaggerServlet.setInitParameter("api.version", "1.0.0");
-        swaggerServlet.setInitParameter("swagger.api.basepath", "/job-server");
-        swaggerServlet.setInitOrder(2);
-        context.addServlet(swaggerServlet, "/swagger");
+        // This makes a servletHolder, configures it, and then adds it to the contextHandler
+        ServletHolder swaggerServletHolder = new ServletHolder(new DefaultJaxrsConfig());
+        swaggerServletHolder.setInitParameter("api.version", "1.0.0");
+        swaggerServletHolder.setInitParameter("swagger.api.basepath", "/job-server");
+        swaggerServletHolder.setInitOrder(2);
+        sch.addServlet(swaggerServletHolder, "/api-docs");
 
         // Add header options
-        FilterHolder cors = context.addFilter(CrossOriginFilter.class, "/*",
-                EnumSet.of(DispatcherType.REQUEST));
+        FilterHolder cors = sch.addFilter(CrossOriginFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
         cors.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, "*");
         cors.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*");
         cors.setInitParameter(CrossOriginFilter.ALLOWED_METHODS_PARAM, "OPTIONS,GET,POST,HEAD");
@@ -86,9 +86,9 @@ public class JobServer {
         ResourceHandler resource_handler = new ResourceHandler();
         resource_handler.setDirectoriesListed(true);
         resource_handler.setWelcomeFiles(new String[]{"index.html"});
-        resource_handler.setResourceBase("/opt/job_server/conf/www/");
+        resource_handler.setResourceBase("swagger-ui");
         HandlerList handlers = new HandlerList();
-        handlers.setHandlers(new Handler[]{resource_handler, context});
+        handlers.setHandlers(new Handler[]{resource_handler, sch});
         server.setHandler(handlers);
 
         Logger.getLogger(JobServer.class.getName()).info("Job Server configured");

@@ -3,13 +3,14 @@ package com.company.jobServer.executors;
 import com.company.jobServer.beans.Job;
 import com.company.jobServer.beans.JobExecution;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
 
 @Slf4j
 public class CollectionJobExecutor extends BaseJobExecutor {
 
   @Override
-  public JobExecution start(Job job) {
-    return super.start(job);
+  public JobExecution start(Job job, JSONObject runtimeParams) {
+    return super.start(job, runtimeParams);
   }
 
   @Override

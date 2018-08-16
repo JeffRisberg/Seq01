@@ -73,65 +73,6 @@ public class Jobs {
         }
     }
 
-    @Path("/create-if-not-exists")
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Creates Job if not exists", response = Job.class)
-    public Response createIfNotExists(Job givenJob) {
-        try {
-            Job job = jobController.createIfNotExists(givenJob);
-
-            if (job != null) {
-                return Response.ok(job).build();
-            }
-
-            return Response.serverError().build();
-        } catch (Exception e) {
-            log.error("Exception during request", e);
-            return Response.serverError().entity(RestTools.getErrorJson("Exception during request", false, Optional.of(e))).build();
-        }
-    }
-
-    @Path("/create-or-update")
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Creates Job or Updates existing Job", response = Job.class)
-    public Response createOrUpdate(Job givenJob) {
-        try {
-            Job job = jobController.createOrUpdate(givenJob);
-
-            if (job != null) {
-                return Response.ok(job).build();
-            }
-
-            return Response.serverError().build();
-        } catch (Exception e) {
-            log.error("Exception during request", e);
-            return Response.serverError().entity(RestTools.getErrorJson("Exception during request", false, Optional.of(e))).build();
-        }
-    }
-
-    @Path("/reference-id/{id}")
-    @GET
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Get Job by Reference Id", response = Job.class)
-    public Response getJobByReferenceIdAndJobType(@PathParam("id") String referenceId) {
-        try {
-            List<Job> jobs = jobController.getByReferenceId(referenceId);
-            Job data = null;
-            if (jobs != null && jobs.size() > 0) {
-                data = jobs.get(0);
-            }
-            return Response.ok(data).build();
-        } catch (Exception e) {
-            log.error("Exception during request", e);
-            return Response.serverError().entity(RestTools.getErrorJson("Exception during request", false, Optional.of(e))).build();
-        }
-    }
-
     @Path("/")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -214,98 +155,6 @@ public class Jobs {
             return Response.ok(jobs).build();
         } catch (Exception e) {
             log.error("Exception during queryJobs request, exception=" + e);
-            return Response.serverError().entity(RestTools.getErrorJson("Exception during request", false, Optional.of(e))).build();
-        }
-    }
-
-    @Path("/{jobId}/airflow-info/{tenantId}/{jobType}/{jobSubType}")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Get Airflow info for a Job by Id", response = JobAirflowInfoDto.class, responseContainer = "List")
-    public Response getJobAirflowInfo(@PathParam("jobId") long jobId,
-                                      @PathParam("tenantId") String tenantId,
-                                      @PathParam("jobType") JobType jobType,
-                                      @PathParam("jobSubType") String jobSubType) {
-        try {
-            log.debug("MKN: Inside getJobAirflowInfo ");
-
-            List<JobAirflowInfoDto> jobAirflowInfos = new ArrayList<>();
-            JobAirflowInfoDto jobAirflowInfo = new JobAirflowInfoDto();
-            String imageTag = ResourceLocator.getResource(DOCKER_IMAGE_TAG).orElse(DEFAULT_DOCKER_IMAGE_TAG);
-
-            Job job = jobController.getById(jobId);
-
-            if (job != null) {
-                if (jobType == JobType.CONNECTOR) {
-
-                    log.debug("MKN: Inside Connector ");
-                    String dockerImageName = job.getDockerImageName();
-
-                    if (dockerImageName == null) dockerImageName = "";
-
-                    if (dockerImageName.endsWith(":")) {
-                        dockerImageName = dockerImageName.substring(0, dockerImageName.length() - 1);
-                    }
-
-                    jobAirflowInfo.setId(job.getId());
-                    jobAirflowInfo.setName(job.getName());
-                    jobAirflowInfo.setJobType(job.getJobType());
-                    jobAirflowInfo.setImage(dockerImageName + ":" + imageTag);
-                    jobAirflowInfo.setOutputModel(job.getOutputModel());
-
-                    List<String> functions = new ArrayList();
-                    if (job.getFunctions() != null) {
-                        job.getFunctions().forEach(func -> functions.add(func.toString()));
-                    }
-                    jobAirflowInfo.setFunctions(functions);
-
-                    JSONObject vars = job.getRuntimeParams();
-                    if (vars != null) {
-                        Set<String> keySet = vars.keySet();
-                        keySet.forEach(key -> {
-                            String value = (String) vars.get(key);
-
-                            jobAirflowInfo.getEnvVars().put(key, value);
-                        });
-                    }
-                } else if (jobType == JobType.MODEL) {
-                    /*
-                    log.debug("MKN: Inside Model ");
-                    ModelClient modelClient = new ModelClient();
-                    // Params Algorithm name (=jobSubType), Tag, Tenant
-                    TrainingExecutionParamsObject execParamsObj =
-                            modelClient.getTrainingExecutionParams(jobSubType, imageTag, tenantId);
-
-                    if (execParamsObj != null) {
-                        log.debug("MKN: Got execParamsObj " + execParamsObj.getAlgorithmImage());
-
-                        jobAirflowInfo.setId(job.getId());
-                        jobAirflowInfo.setTenantId(tenantId);
-                        jobAirflowInfo.setName(job.getName());
-                        jobAirflowInfo.setJobType(job.getJobType());
-                        jobAirflowInfo.setJobSubType(jobSubType);
-                        jobAirflowInfo.setImage(execParamsObj.getAlgorithmImage());
-                        jobAirflowInfo.setOutputModel(execParamsObj.getOutputModelLocation());
-                        jobAirflowInfo.setContainerArgs(execParamsObj.getContainerArgs());
-                        jobAirflowInfo.setContainerCommands(execParamsObj.getContainerCommands());
-
-                        jobAirflowInfo.setEnvVars(execParamsObj.getEnvVars());
-                    } else {
-                        log.error("MKN: execParamsObj was null");
-                    }
-                    */
-                } else if (jobType == JobType.COLLECTION) {
-                    log.warn("No behavior for Collection jobType");
-                } else {
-                    log.warn("Unknown jobType");
-                }
-
-                jobAirflowInfos.add(jobAirflowInfo);
-            }
-
-            return Response.ok(jobAirflowInfos).build();
-        } catch (Exception e) {
-            log.error("Exception during request", e);
             return Response.serverError().entity(RestTools.getErrorJson("Exception during request", false, Optional.of(e))).build();
         }
     }
@@ -414,11 +263,11 @@ public class Jobs {
                         */
                     } else {
                         if (job.getJobType() == JobType.CONNECTOR) {
-                            jobExecution = connectorJobExecutor.start(job);
+                            jobExecution = connectorJobExecutor.start(job, null);
                         } else if (job.getJobType() == JobType.MODEL) {
-                            jobExecution = modelJobExecutor.start(job);
+                            jobExecution = modelJobExecutor.start(job, null);
                         } else if (job.getJobType() == JobType.COLLECTION) {
-                            jobExecution = collectionJobExecutor.start(job);
+                            jobExecution = collectionJobExecutor.start(job, null);
                         } else {
                             log.error("Unknown JobType " + job.getJobType());
                         }
@@ -478,8 +327,8 @@ public class Jobs {
             job1.setName("main-" + tenantId);
             job1.setReferenceId("main-" + tenantId);
 
-            JSONObject env1 = new JSONObject();
-            job1.setRuntimeParams(env1);
+            //JSONObject env1 = new JSONObject();
+            //job1.setRuntimeParams(env1);
             Job createdJob1 = jobController.create(job1);
             DAGNode dagNode1 = new DAGNode();
             dagNode1.setName(generateUniqueName("node1"));
@@ -527,7 +376,7 @@ public class Jobs {
             //env2.put("company_connector_config", config2.toJSONString());
 
             job2.setFunctions(functions2);
-            job2.setRuntimeParams(config2);
+            //job2.setRuntimeParams(config2);
 
             Job createdJob2 = jobController.create(job2);
             dagNode2.setName(generateUniqueName("node2"));
@@ -565,7 +414,7 @@ public class Jobs {
             //env3.put("company_training_input_config", config3.toJSONString());
 
             job3.setHyperParameters(new JSONObject());
-            job3.setRuntimeParams(config3);
+            //job3.setRuntimeParams(config3);
 
             Job createdJob3 = jobController.create(job3);
             DAGNode dagNode3 = new DAGNode();
@@ -604,7 +453,7 @@ public class Jobs {
             //env4.put("company_training_input_config", config4.toJSONString());
 
             job4.setHyperParameters(new JSONObject());
-            job4.setRuntimeParams(config4);
+            //job4.setRuntimeParams(config4);
 
             Job createdJob4 = jobController.create(job4);
             DAGNode dagNode4 = new DAGNode();
@@ -643,7 +492,7 @@ public class Jobs {
             //env5.put("company_training_input_config", config5.toJSONString());
 
             job5.setHyperParameters(new JSONObject());
-            job5.setRuntimeParams(config5);
+            //job5.setRuntimeParams(config5);
 
             Job createdJob5 = jobController.create(job5);
             DAGNode dagNode5 = new DAGNode();
