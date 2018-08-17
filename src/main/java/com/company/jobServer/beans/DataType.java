@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @Entity
-@Table(name = "data_type", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "image_tag"})})
+@Table(name = "data_type")
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class DataType extends AbstractDatabaseItem {
