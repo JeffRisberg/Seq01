@@ -18,9 +18,8 @@
     <property name="hbm2ddl.auto">update</property>
 
     <mapping class="com.company.jobServer.beans.DAGNode"/>
-    <mapping class="com.company.jobServer.beans.DAGNodeDependency"/>
-    <mapping class="com.company.jobServer.beans.DAGNodeExecution"/>
     <mapping class="com.company.jobServer.beans.Job"/>
+    <mapping class="com.company.jobServer.beans.JobDependency"/>
     <mapping class="com.company.jobServer.beans.JobExecution"/>
   </session-factory>
 </hibernate-configuration>

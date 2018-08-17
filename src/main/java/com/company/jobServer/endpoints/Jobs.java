@@ -3,18 +3,15 @@ package com.company.jobServer.endpoints;
 import com.company.jobServer.FilterDescription;
 import com.company.jobServer.FilterOperator;
 import com.company.jobServer.beans.DAGNode;
-import com.company.jobServer.beans.DAGNodeDependency;
+import com.company.jobServer.beans.JobDependency;
 import com.company.jobServer.beans.Job;
 import com.company.jobServer.beans.JobExecution;
-import com.company.jobServer.beans.dto.AirflowResponseDto;
-import com.company.jobServer.beans.dto.JobAirflowInfoDto;
 import com.company.jobServer.beans.enums.DAGNodeType;
-import com.company.jobServer.beans.enums.JobStateAction;
 import com.company.jobServer.beans.enums.JobType;
 import com.company.jobServer.common.ResourceLocator;
 import com.company.jobServer.common.RestTools;
 import com.company.jobServer.controllers.DAGNodeController;
-import com.company.jobServer.controllers.DAGNodeDependencyController;
+import com.company.jobServer.controllers.JobDependencyController;
 import com.company.jobServer.controllers.JobController;
 import com.company.jobServer.controllers.JobExecutionController;
 import com.company.jobServer.executors.CollectionJobExecutor;
@@ -47,7 +44,7 @@ public class Jobs {
     private static final JobController jobController = new JobController();
     private static final JobExecutionController jobExecutionController = new JobExecutionController();
     private static final DAGNodeController dagNodeController = new DAGNodeController();
-    private static final DAGNodeDependencyController dagNodeDependencyController = new DAGNodeDependencyController();
+    private static final JobDependencyController dagNodeDependencyController = new JobDependencyController();
 
     private static final ConnectorJobExecutor connectorJobExecutor = new ConnectorJobExecutor();
     private static final ModelJobExecutor modelJobExecutor = new ModelJobExecutor();
@@ -229,7 +226,7 @@ public class Jobs {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Create set of jobs", response = Job.class)
+    @ApiOperation(value = "Create DAG of jobs", response = Job.class)
     public Response populate(@PathParam("tenantId") String tenantId,
                              @PathParam("dataSourceId") Long dataSourceId,
                              @PathParam("clusterName") String clusterName) {
@@ -261,7 +258,6 @@ public class Jobs {
             dagNode1.setName(generateUniqueName("node1"));
             dagNode1.setType(DAGNodeType.EXECUTE);
             dagNode1.setJobId(createdJob1.getId());
-            DAGNode createdDagNode1 = dagNodeController.create(dagNode1);
 
             Job job2 = new Job();
             DAGNode dagNode2 = new DAGNode();
@@ -309,9 +305,8 @@ public class Jobs {
             dagNode2.setName(generateUniqueName("node2"));
             dagNode2.setType(DAGNodeType.EXECUTE);
             dagNode2.setJobId(createdJob2.getId());
-            DAGNode createdDagNode2 = dagNodeController.create(dagNode2);
-            DAGNodeDependency dnd2 = new DAGNodeDependency();
-            dnd2.assign(createdDagNode1, createdDagNode2);
+            JobDependency dnd2 = new JobDependency();
+            dnd2.assign(createdJob1, createdJob2);
             dagNodeDependencyController.create(dnd2);
 
             Job job3 = new Job();
@@ -348,9 +343,8 @@ public class Jobs {
             dagNode3.setName(generateUniqueName("node3"));
             dagNode3.setType(DAGNodeType.EXECUTE);
             dagNode3.setJobId(createdJob3.getId());
-            DAGNode createdDagNode3 = dagNodeController.create(dagNode3);
-            DAGNodeDependency dnd3 = new DAGNodeDependency();
-            dnd3.assign(createdDagNode2, createdDagNode3);
+            JobDependency dnd3 = new JobDependency();
+            dnd3.assign(createdJob2, createdJob3);
             dagNodeDependencyController.create(dnd3);
 
             Job job4 = new Job();
@@ -387,9 +381,8 @@ public class Jobs {
             dagNode4.setName(generateUniqueName("node4"));
             dagNode4.setType(DAGNodeType.EXECUTE);
             dagNode4.setJobId(createdJob4.getId());
-            DAGNode createdDagNode4 = dagNodeController.create(dagNode4);
-            DAGNodeDependency dnd4 = new DAGNodeDependency();
-            dnd4.assign(createdDagNode3, createdDagNode4);
+            JobDependency dnd4 = new JobDependency();
+            dnd4.assign(createdJob3, createdJob4);
             dagNodeDependencyController.create(dnd4);
 
             Job job5 = new Job();
@@ -426,9 +419,8 @@ public class Jobs {
             dagNode5.setName(generateUniqueName("node5"));
             dagNode5.setType(DAGNodeType.EXECUTE);
             dagNode5.setJobId(createdJob5.getId());
-            DAGNode createdDagNode5 = dagNodeController.create(dagNode5);
-            DAGNodeDependency dnd5 = new DAGNodeDependency();
-            dnd5.assign(createdDagNode4, createdDagNode5);
+            JobDependency dnd5 = new JobDependency();
+            dnd5.assign(createdJob4, createdJob5);
             dagNodeDependencyController.create(dnd5);
 
             return Response.ok(job1).build();

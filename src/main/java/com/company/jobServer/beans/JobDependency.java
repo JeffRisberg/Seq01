@@ -14,16 +14,16 @@ import javax.validation.constraints.NotNull;
  */
 @Data
 @Entity
-@Table(name = "dag_node_dependencies")
+@Table(name = "job_dependencies")
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DAGNodeDependency extends AbstractDatabaseItem {
+public class JobDependency extends AbstractDatabaseItem {
 
   @ManyToOne()
   @JoinColumn(name = "from_id", insertable = false, updatable = false)
   @ApiModelProperty(required = true, value = "Id of 'from' Node")
   @JsonIgnore
-  private DAGNode from;
+  private Job from;
 
   @Column(name = "from_id")
   @NotNull
@@ -34,7 +34,7 @@ public class DAGNodeDependency extends AbstractDatabaseItem {
   @JoinColumn(name = "to_id", insertable = false, updatable = false)
   @ApiModelProperty(required = true, value = "Id of 'to' Node")
   @JsonIgnore
-  private DAGNode to;
+  private Job to;
 
   @Column(name = "to_id")
   @NotNull
@@ -44,14 +44,14 @@ public class DAGNodeDependency extends AbstractDatabaseItem {
   /**
    * Helpful setup method
    *
-   * @param fromNode
-   * @param toNode
+   * @param from
+   * @param to
    */
-  public void assign(DAGNode fromNode, DAGNode toNode) {
-    this.from = fromNode;
-    this.fromId = fromNode.getId();
-    this.to = toNode;
-    this.toId = toNode.getId();
+  public void assign(Job from, Job to) {
+    this.from = from;
+    this.fromId = from.getId();
+    this.to = to;
+    this.toId = to.getId();
   }
 }
 

@@ -6,12 +6,15 @@ import com.company.jobServer.beans.JobExecution;
 import com.company.jobServer.beans.enums.JobType;
 import com.company.jobServer.common.orchestration.DeploymentHandle;
 import com.company.jobServer.common.orchestration.ExecutionStatus;
+import com.company.jobServer.services.JobLaunchService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.Future;
 
 @Slf4j
 public class CompletionChecker implements Runnable {
+
+  static JobLaunchService jobLaunchService = new JobLaunchService();
 
   protected JobExecution jobExecution;
   protected DeploymentHandle handle;
@@ -24,7 +27,7 @@ public class CompletionChecker implements Runnable {
   @Override
   public void run() {
     try {
-      ExecutionStatus status = null;// JobServer.containerService.getDeploymentStatus(handle);
+      ExecutionStatus status = jobLaunchService.getDeploymentStatus(handle);
 
       log.info("status on " + handle.getName() + " is " + status);
 
