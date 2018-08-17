@@ -1,5 +1,8 @@
 package com.company.jobServer.common.orchestration;
 
+import lombok.Data;
+
+@Data
 public class DeploymentHandleDTO implements DeploymentHandle {
   private String namespace;
   private String name;

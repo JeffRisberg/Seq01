@@ -4,7 +4,6 @@ import com.company.jobServer.beans.Job;
 import com.company.jobServer.beans.JobExecution;
 import com.company.jobServer.common.orchestration.*;
 import com.squareup.okhttp.Credentials;
-import com.sun.xml.internal.ws.api.message.Packet;
 import io.kubernetes.client.ApiClient;
 import io.kubernetes.client.Configuration;
 import io.kubernetes.client.apis.BatchV1Api;
@@ -22,9 +21,6 @@ import java.util.Random;
 public class JobLaunchService {
 
   static Random random = new Random();
-
-  BatchV1Api batchV1Api = new BatchV1Api();
-  BatchV2alpha1Api batchV2alpha1Api = new BatchV2alpha1Api();
 
   public JobLaunchService() {
   }
@@ -58,11 +54,14 @@ public class JobLaunchService {
 
       V1Job v1Job = createJob(deployableObject);
 
-      batchV1Api.createNamespacedJob(deployableObject.getNamespace(), v1Job, pretty);
+      BatchV1Api batchV1Api = new BatchV1Api();
+      V1Job createdV1Job = batchV1Api.createNamespacedJob(deployableObject.getNamespace(), v1Job, pretty);
 
       DeploymentHandle deploymentHandle = new DeploymentHandleDTO();
-      deploymentHandle.setName(job.getName());
-      deploymentHandle.setNamespace(namespace);
+      deploymentHandle.setUUID(createdV1Job.getMetadata().getUid());
+      deploymentHandle.setName(createdV1Job.getMetadata().getName());
+      deploymentHandle.setNamespace(createdV1Job.getMetadata().getNamespace());
+      deploymentHandle.setDeploymentType(ExecutionType.Job);
 
       return deploymentHandle;
 
@@ -73,47 +72,70 @@ public class JobLaunchService {
   }
 
   public ExecutionStatus getDeploymentStatus(DeploymentHandle deploymentHandle) throws Exception {
-    String pretty = "TRUE";
+    System.out.println("checking deployment status on " + deploymentHandle);
+    try {
+      String configFile = "/Users/jeff/.kube/config";
+      ApiClient client = Config.fromConfig(configFile);
 
-    switch (deploymentHandle.getDeploymentType()) {
-      case CronJob:
-        V2alpha1CronJobList cronJobList = batchV2alpha1Api.listNamespacedCronJob(deploymentHandle.getNamespace(), pretty,
-          "", "metadata.name=" + deploymentHandle.getName(), true, null, 100, null, 30, false);
-        if (cronJobList.getItems().size() == 0)
+      ApiKeyAuth BearerToken = (ApiKeyAuth) client.getAuthentication("BearerToken");
+
+      if (BearerToken.getApiKey() == null) {
+        System.out.println("Setting up AppKey");
+
+        BearerToken.setApiKey(Credentials.basic(
+          ((HttpBasicAuth) client.getAuthentications().get("BasicAuth")).getUsername(),
+          ((HttpBasicAuth) client.getAuthentications().get("BasicAuth")).getPassword()));
+      }
+      client.setDebugging(true);
+      Configuration.setDefaultApiClient(client);
+      String pretty = "TRUE";
+
+      BatchV1Api batchV1Api = new BatchV1Api();
+      BatchV2alpha1Api batchV2alpha1Api = new BatchV2alpha1Api();
+
+      switch (deploymentHandle.getDeploymentType()) {
+        case CronJob:
+          V2alpha1CronJobList cronJobList = batchV2alpha1Api.listNamespacedCronJob(deploymentHandle.getNamespace(), pretty,
+            "", "metadata.name=" + deploymentHandle.getName(), true, null, 100, null, 30, false);
+          if (cronJobList.getItems().size() == 0)
+            return ExecutionStatus.Unknown;
+
+          V2alpha1CronJob cronJob = cronJobList.getItems().get(0);
+          if (cronJob.getStatus().getActive() == null || cronJob.getStatus().getActive().size() == 0) {
+            return ExecutionStatus.Pending;
+          } else {
+            return ExecutionStatus.Running;
+          }
+        case Job:
+          V1JobList jobList = batchV1Api.listNamespacedJob(deploymentHandle.getNamespace(), pretty,
+            "", "metadata.name=" + deploymentHandle.getName(), true, null, 100, null, 30, false);
+          if (jobList.getItems().size() == 0)
+            return ExecutionStatus.Unknown;
+
+          V1Job job = jobList.getItems().get(0);
+          if (job.getStatus() == null) {
+            return ExecutionStatus.Pending;
+          }
+          if (job.getStatus().getFailed() != null && job.getStatus().getFailed() >= 3) {
+            return ExecutionStatus.Failed;
+          }
+          if (job.getStatus().getSucceeded() != null && job.getStatus().getSucceeded() > 0) {
+            return ExecutionStatus.Succeeded;
+          }
+          if (job.getStatus().getActive() != null && job.getStatus().getActive() > 0) {
+            return ExecutionStatus.Running;
+          }
+          break;
+        case Pod:
           return ExecutionStatus.Unknown;
-
-        V2alpha1CronJob cronJob = cronJobList.getItems().get(0);
-        if (cronJob.getStatus().getActive() == null || cronJob.getStatus().getActive().size() == 0) {
-          return ExecutionStatus.Pending;
-        } else {
-          return ExecutionStatus.Running;
-        }
-      case Job:
-        V1JobList jobList = batchV1Api.listNamespacedJob(deploymentHandle.getNamespace(), pretty,
-          "", "metadata.name=" + deploymentHandle.getName(), true, null, 100, null, 30, false);
-        if (jobList.getItems().size() == 0)
+        case Deployment:
           return ExecutionStatus.Unknown;
-
-        V1Job job = jobList.getItems().get(0);
-        if (job.getStatus() == null) {
-          return ExecutionStatus.Pending;
-        }
-        if (job.getStatus().getFailed() != null && job.getStatus().getFailed() >= 3) {
-          return ExecutionStatus.Failed;
-        }
-        if (job.getStatus().getSucceeded() != null && job.getStatus().getSucceeded() > 0) {
-          return ExecutionStatus.Succeeded;
-        }
-        if (job.getStatus().getActive() != null && job.getStatus().getActive() > 0) {
-          return ExecutionStatus.Running;
-        }
-        break;
-      case Pod:
-        return ExecutionStatus.Unknown;
-      case Deployment:
-        return ExecutionStatus.Unknown;
+      }
+      return ExecutionStatus.Unknown;
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
     }
-    return ExecutionStatus.Unknown;
   }
 
   private V1Job createJob(DeployableObject deployableObject) {

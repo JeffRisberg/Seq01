@@ -93,7 +93,6 @@ public class BaseJobExecutor implements IJobExecutor {
                 jobExecution.setHandleData(mapper.writeValueAsString(handle));
                 jobExecution.setOutputLocation(job.getOutputModel());
 
-
                 CompletionChecker completionChecker = new CompletionChecker(jobExecution, handle);
 
                 ScheduledFuture<?> future = JobServer.executor.scheduleAtFixedRate
