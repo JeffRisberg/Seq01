@@ -17,6 +17,9 @@
     <property name="hibernate.show_sql">true</property>
     <property name="hbm2ddl.auto">update</property>
 
+    <mapping class="com.company.jobServer.beans.Algorithm"/>
+    <mapping class="com.company.jobServer.beans.AlgorithmDataType"/>
+    <mapping class="com.company.jobServer.beans.DataType"/>
     <mapping class="com.company.jobServer.beans.DAGNode"/>
     <mapping class="com.company.jobServer.beans.Job"/>
     <mapping class="com.company.jobServer.beans.JobDependency"/>
