@@ -150,7 +150,7 @@ public class JobServer {
         configuration.setProperty("hibernate.connection.username", dbUser);
 
         String dbPassword = ResourceLocator.getResource(DB_PASSWORD).orElse(DEFAULT_DB_PASSWORD);
-        logger.info("Using dbPassword: " + dbPassword);
+        //logger.info("Using dbPassword: " + dbPassword);
         configuration.setProperty("hibernate.connection.password", dbPassword);
 
         return configuration.configure();
