@@ -1,6 +1,7 @@
 package com.company.jobServer;
 
 import com.company.jobServer.common.ResourceLocator;
+import com.company.jobServer.services.DagAnalyzer;
 import io.swagger.jaxrs.config.DefaultJaxrsConfig;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
@@ -174,5 +175,8 @@ public class JobServer {
         startJobServer();
 
         logger.info("Job Server is started");
+
+        DagAnalyzer DagAnalyzer = new DagAnalyzer();
+        System.out.println(DagAnalyzer.getNextJobs());
     }
 }
