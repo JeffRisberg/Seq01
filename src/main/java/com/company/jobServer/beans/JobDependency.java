@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.sql.Timestamp;
 
 /**
  *
@@ -52,6 +53,8 @@ public class JobDependency extends AbstractDatabaseItem {
     this.fromId = from.getId();
     this.to = to;
     this.toId = to.getId();
+
+    setCreatedAt(new Timestamp(System.currentTimeMillis()));
   }
 }
 

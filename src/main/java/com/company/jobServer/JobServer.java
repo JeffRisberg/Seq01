@@ -1,8 +1,12 @@
 package com.company.jobServer;
 
 import com.company.jobServer.beans.Job;
+import com.company.jobServer.beans.JobDependency;
 import com.company.jobServer.beans.JobExecution;
+import com.company.jobServer.beans.enums.JobType;
 import com.company.jobServer.common.ResourceLocator;
+import com.company.jobServer.controllers.JobController;
+import com.company.jobServer.controllers.JobDependencyController;
 import com.company.jobServer.controllers.JobExecutionController;
 import com.company.jobServer.services.NextJobService;
 import io.swagger.jaxrs.config.DefaultJaxrsConfig;
@@ -22,10 +26,7 @@ import org.hibernate.cfg.Configuration;
 
 import javax.servlet.DispatcherType;
 import java.sql.Timestamp;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -181,15 +182,44 @@ public class JobServer {
 
     logger.info("Job Server is started");
 
-    JobExecutionController jec = new JobExecutionController();
+    // All code below this point should be moved into Unit test
 
-    List<JobExecution> jeList = jec.getByJobId(5L);
+    JobController jc = new JobController();
+    JobExecutionController jec = new JobExecutionController();
+    JobDependencyController jdc = new JobDependencyController();
+
+    List<FilterDescription> filterDescriptions = new ArrayList<FilterDescription>();
+    filterDescriptions.add(new FilterDescription("name", FilterOperator.eq, "job100"));
+    List<Job> matchingJobs = jc.getByCriteria(filterDescriptions);
+
+    Job rootJob = null;
+    if (matchingJobs.size() == 0) {
+      // set up the test jobs
+      Job job100 = new Job(null, "job100", "job100 desc", JobType.COLLECTION, null);
+      Job createdJob100 = jc.create(job100);
+
+      Job job101 = new Job(createdJob100, "job101", "job101 desc", JobType.CONNECTOR, "us.gcr.io/aisera-123/connector-snow:Milestone_8.1");
+      Job createdJob101 = jc.create(job101);
+
+      Job job102 = new Job(createdJob100, "job102", "job102 desc", JobType.CONNECTOR, "us.gcr.io/aisera-123/connector-jira:Milestone_8.1");
+      Job createdJob102 = jc.create(job102);
+
+      JobDependency jd12 = new JobDependency();
+      jd12.assign(createdJob101, createdJob102);
+      jdc.create(jd12);
+
+      rootJob = createdJob100;
+    } else {
+      rootJob = matchingJobs.get(0);
+    }
+
+    List<JobExecution> jeList = jec.getByJobId(rootJob.getId());
     JobExecution jobExecution = null;
 
     if (jeList.size() == 0) {
       jobExecution = new JobExecution();
       jobExecution.setCreatedAt(new Timestamp(System.currentTimeMillis()));
-      jobExecution.setJobId(5L);
+      jobExecution.setJobId(rootJob.getId());
       jec.create(jobExecution);
     }
     else {

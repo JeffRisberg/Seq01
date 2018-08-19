@@ -64,12 +64,12 @@ public class Job extends AbstractDatabaseItem {
   @Column(name = "compute_resource")
   @Enumerated(EnumType.STRING)
   @ApiModelProperty(value = "Compute Resource")
-  private ClusterType computeResource = ClusterType.DOCKER;
+  private ClusterType computeResource = ClusterType.KUBERNETES;
 
   @Column(name = "job_schedule_type")
   @Enumerated(EnumType.STRING)
   @ApiModelProperty(required = true, value = "JobScheduleType")
-  private JobScheduleType jobScheduleType = JobScheduleType.CRON;
+  private JobScheduleType jobScheduleType = JobScheduleType.ONDEMAND;
 
   @Column(name = "cron_schedule", columnDefinition = "TEXT")
   @ApiModelProperty(value = "Cron schedule string")
@@ -125,5 +125,16 @@ public class Job extends AbstractDatabaseItem {
   @Column(name = "target_utilization")
   @ApiModelProperty(value = "Utilization percentage that triggers autoscaling. Minimum value: 0. Maximum value: 100")
   private Long targetUtilization = null;
+
+  public Job(Job parent, String name, String description, JobType jobType, String dockerImageName) {
+    this.parent = parent;
+    this.parentId = parent != null ? parent.getId() : null;
+    this.name = name;
+    this.description = description;
+    this.jobType = jobType;
+    this.dockerImageName = dockerImageName;
+
+    setCreatedAt(new Timestamp(System.currentTimeMillis()));
+  }
 }
 
