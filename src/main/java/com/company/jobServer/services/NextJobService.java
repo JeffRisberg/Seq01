@@ -7,17 +7,24 @@ import com.company.jobServer.controllers.JobController;
 import com.company.jobServer.controllers.JobDependencyController;
 import com.company.jobServer.controllers.JobExecutionController;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-public class DagAnalyzer {
+public class NextJobService {
 
+  protected JobExecution targetExecution;
   protected List<Job> jobs;
   protected List<JobDependency> jobDependencies;
   protected List<JobExecution> jobExecutions;
+  protected Set<Job> pendingJobs;
 
-  public DagAnalyzer() {
+  public NextJobService(JobExecution targetExecution) {
+    this.targetExecution = targetExecution;
+    Job targetJob = targetExecution.getJob();
+
     try {
       JobController jc = new JobController();
       JobDependencyController jdc = new JobDependencyController();
@@ -27,14 +34,38 @@ public class DagAnalyzer {
       this.jobDependencies = jdc.getAll();
       this.jobExecutions = jec.getAll();
 
+      this.pendingJobs = new HashSet<>();
+
+      for (Job job : jobs) {
+        if (job.getParent() != null && job.getParent().getId() == targetJob.getId())
+          pendingJobs.add(job);
+      }
     } catch (Exception e) {
     }
   }
 
+  Set<Job> queryDependencies(Set<Job> dependencies, Job target) {
+    if (dependencies.contains(target)) {
+      return dependencies;
+    }
+
+    dependencies.add(target);
+
+    for (JobDependency jd : jobDependencies) {
+      if (jd.getToId() == target.getId())
+        queryDependencies(dependencies, jd.getFrom());
+    }
+    return dependencies;
+  }
+
   public Optional<JobExecution> getJobExecution(Job job) {
-    Optional<JobExecution> optJe = jobExecutions.stream().filter(
+    return jobExecutions.stream().filter(
       je -> je.getJob().getId() == job.getId()).findFirst();
-    return optJe;
+  }
+
+  public List<JobExecution> getJobExecutions(Job job) {
+    return jobExecutions.stream().filter(
+      je -> je.getJob().getId() == job.getId()).collect(Collectors.toList());
   }
 
   public boolean areAllDependenciesMet(Job job) {
@@ -53,18 +84,22 @@ public class DagAnalyzer {
   }
 
   public List<Job> getNextJobs() {
-    List<Job> nextJobs = jobs.stream().filter(
+    return pendingJobs.stream().filter(
       job -> {
-        Optional<JobExecution> optJe = getJobExecution(job);
+        List<JobExecution> jeList = getJobExecutions(job);
 
-        if (optJe.isPresent() && optJe.get().isDone()) {
+        for (JobExecution je : jeList) {
+          JobExecution parentJE = je.getParentExecution();
+
+          if (parentJE.getId() != targetExecution.getId()) {
+            continue;
+          }
+
           return false;
         }
 
         return areAllDependenciesMet(job);
       }
     ).collect(Collectors.toList());
-
-    return nextJobs;
   }
 }
