@@ -19,7 +19,7 @@ public class NextJobService {
   protected List<Job> jobs;
   protected List<JobDependency> jobDependencies;
   protected List<JobExecution> jobExecutions;
-  protected Set<Job> pendingJobs;
+  protected Set<Job> candidateJobs;
 
   public NextJobService(JobExecution targetExecution) {
     this.targetExecution = targetExecution;
@@ -34,11 +34,11 @@ public class NextJobService {
       this.jobDependencies = jdc.getAll();
       this.jobExecutions = jec.getAll();
 
-      this.pendingJobs = new HashSet<>();
+      this.candidateJobs = new HashSet<>();
 
       for (Job job : jobs) {
         if (job.getParent() != null && job.getParent().getId() == targetJob.getId())
-          pendingJobs.add(job);
+          candidateJobs.add(job);
       }
     } catch (Exception e) {
     }
@@ -84,21 +84,23 @@ public class NextJobService {
   }
 
   public List<Job> getNextJobs() {
-    return pendingJobs.stream().filter(
-      job -> {
-        List<JobExecution> jeList = getJobExecutions(job);
+    return candidateJobs.stream().filter(
+      candidateJob -> {
+        List<JobExecution> jeList = getJobExecutions(candidateJob);
 
         for (JobExecution je : jeList) {
           JobExecution parentJE = je.getParentExecution();
 
+          // Make sure this execution is within the target execution
           if (parentJE.getId() != targetExecution.getId()) {
             continue;
           }
 
+          // This job is already executing within the target execution, so it is not a candidate
           return false;
         }
 
-        return areAllDependenciesMet(job);
+        return areAllDependenciesMet(candidateJob);
       }
     ).collect(Collectors.toList());
   }
