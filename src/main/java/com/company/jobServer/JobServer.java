@@ -1,5 +1,6 @@
 package com.company.jobServer;
 
+import com.company.jobServer.beans.Job;
 import com.company.jobServer.beans.JobExecution;
 import com.company.jobServer.common.ResourceLocator;
 import com.company.jobServer.controllers.JobExecutionController;
@@ -194,8 +195,12 @@ public class JobServer {
     else {
       jobExecution = jeList.get(0);
     }
-    NextJobService DagAnalyzer = new NextJobService(jobExecution);
 
-    System.out.println(DagAnalyzer.getNextJobs());
+    NextJobService nextJobService = new NextJobService(jobExecution);
+
+    List<Job> nextJobs = nextJobService.getNextJobs();
+    for (Job job : nextJobs) {
+      System.out.println(job.getName());
+    }
   }
 }
