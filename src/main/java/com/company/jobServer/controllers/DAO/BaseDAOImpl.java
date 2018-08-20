@@ -24,7 +24,6 @@ public class BaseDAOImpl implements BaseDAO {
   public <T> T create(T obj, Class<T> type, Session session) {
     long id;
     id = (long) session.save(obj);
-    log.info("Saving ID: " + id);
     obj = getById(type, id, session);
     return obj;
   }
