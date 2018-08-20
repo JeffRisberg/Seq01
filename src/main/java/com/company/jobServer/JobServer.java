@@ -25,7 +25,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
 import javax.servlet.DispatcherType;
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -177,6 +176,33 @@ public class JobServer {
     executor.shutdown();
   }
 
+  protected static void x(Job rootJob) throws Exception {
+    JobController jc = new JobController();
+    JobExecutionController jec = new JobExecutionController();
+    JobDependencyController jdc = new JobDependencyController();
+
+    List<JobExecution> jeList = jec.getByJobId(rootJob.getId());
+    JobExecution jobExecution = null;
+
+    if (jeList.size() == 0) {
+      System.out.println("building je");
+      jobExecution = new JobExecution();
+      jobExecution.setJob(rootJob);
+      jobExecution.setJobId(rootJob.getId());
+      jec.create(jobExecution);
+    } else {
+      System.out.println("using je");
+      jobExecution = jeList.get(0);
+    }
+
+    NextJobService nextJobService = new NextJobService(jobExecution);
+
+    List<Job> nextJobs = nextJobService.getNextJobs();
+    for (Job job : nextJobs) {
+      System.out.println("next job for root job " + rootJob.getName() + " : " + job.getName());
+    }
+  }
+
   public static void main(String[] args) throws Exception {
     startJobServer();
 
@@ -194,6 +220,7 @@ public class JobServer {
 
     Job rootJob = null;
     if (matchingJobs.size() == 0) {
+      System.out.println("building jobs");
       // set up the test jobs
       Job job100 = new Job(null, "job100", "job100 desc", JobType.COLLECTION, null);
       Job createdJob100 = jc.create(job100);
@@ -210,27 +237,15 @@ public class JobServer {
 
       rootJob = createdJob100;
     } else {
+      System.out.println("using jobs");
       rootJob = matchingJobs.get(0);
     }
 
-    List<JobExecution> jeList = jec.getByJobId(rootJob.getId());
-    JobExecution jobExecution = null;
+    x(rootJob);
 
-    if (jeList.size() == 0) {
-      jobExecution = new JobExecution();
-      jobExecution.setCreatedAt(new Timestamp(System.currentTimeMillis()));
-      jobExecution.setJobId(rootJob.getId());
-      jec.create(jobExecution);
-    }
-    else {
-      jobExecution = jeList.get(0);
-    }
-
-    NextJobService nextJobService = new NextJobService(jobExecution);
-
-    List<Job> nextJobs = nextJobService.getNextJobs();
-    for (Job job : nextJobs) {
-      System.out.println(job.getName());
+    Job job5 = jc.getById(5L);
+    if (job5 != null) {
+      x(job5);
     }
   }
 }

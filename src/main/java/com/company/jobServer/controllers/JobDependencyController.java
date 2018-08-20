@@ -13,15 +13,15 @@ public class JobDependencyController extends BaseController {
   private static JobDependencyDAO dao = new JobDependencyDAO();
 
   public JobDependency getById(Long id) throws Exception {
-    final AtomicReference<JobDependency> td = new AtomicReference<>();
-    doWork(session -> td.set(dao.getById(id, session)));
-    return td.get();
+    final AtomicReference<JobDependency> jd = new AtomicReference<>();
+    doWork(session -> jd.set(dao.getById(id, session)));
+    return jd.get();
   }
 
   public JobDependency create(JobDependency dagNodeDependency) throws Exception {
-    final AtomicReference<JobDependency> jobId = new AtomicReference<>();
-    doWork(session -> jobId.set(dao.create(dagNodeDependency, session)));
-    return jobId.get();
+    final AtomicReference<JobDependency> jd = new AtomicReference<>();
+    doWork(session -> jd.set(dao.create(dagNodeDependency, session)));
+    return jd.get();
   }
 
   public boolean update(JobDependency updatedEntity) throws Exception {

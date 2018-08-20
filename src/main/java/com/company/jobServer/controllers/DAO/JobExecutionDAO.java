@@ -33,33 +33,6 @@ public class JobExecutionDAO extends BaseDAOImpl {
     return super.deleteById(JobExecution.class, id, session);
   }
 
-  /*
-  public boolean updateByState(JobExecutionState jobExecutionState, Timestamp endDateTime) {
-    Session session = null;
-    Transaction tx = null;
-    try {
-      session = JobServer.sessionFactory.openSession();
-      tx = session.beginTransaction();
-
-      String sql = "UPDATE job_executions SET status=:state, stopped_at=:end_datetime WHERE deployment_handle=:handle";
-      NativeQuery query = session.createNativeQuery(sql)
-        .setParameter("state", jobExecutionState.getState().name())
-        .setParameter("end_datetime", endDateTime)
-        .setParameter("handle", jobExecutionState.getHandle())
-        .addEntity(JobExecution.class);
-
-      int result = query.executeUpdate();
-      tx.commit();
-      log.debug("updateByState for " + jobExecutionState.getHandle() + (result > 0 ? true : false));
-      return (result > 0 ? true : false);
-    } catch (Exception e) {
-      if (tx != null)
-        tx.rollback();
-      return false;
-    }
-  }
-  */
-
   public boolean updateById(JobExecution jobExecution, JobStatus jobStatus, Timestamp endDateTime) {
     Session session = null;
     Transaction tx = null;

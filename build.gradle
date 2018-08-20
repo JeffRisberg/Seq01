@@ -23,7 +23,6 @@ ext {
   slf4jVersion = '1.7.25'
   projectLombokVersion = '1.16.20'
   jodaTimeVersion = '2.9.9'
-  guiceVersion = '4.2.0'
   jettyVersion = '9.4.6.v20170531'
   jerseyVersion = '2.26'
   hk2Version = '2.5.0-b44'
@@ -31,6 +30,14 @@ ext {
 }
 
 dependencies {
+  compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+  compile group: 'org.slf4j', name: 'log4j-over-slf4j', version: '1.7.25'
+
+  compile "org.slf4j:slf4j-api:$slf4jVersion"
+  runtime "org.slf4j:slf4j-simple:$slf4jVersion"
+
+  compile "commons-configuration:commons-configuration:1.6"
+
   compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.0'
   compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
 
@@ -46,16 +53,7 @@ dependencies {
   compile group: 'com.sun.jersey', name: 'jersey-servlet', version: '1.19'
   compile group: 'io.swagger', name: 'swagger-jaxrs', version: '1.5.9'
 
-  compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
-  compile group: 'org.slf4j', name: 'log4j-over-slf4j', version: '1.7.25'
-
-  compile "org.slf4j:slf4j-api:$slf4jVersion"
-  runtime "org.slf4j:slf4j-simple:$slf4jVersion"
-
-  compile "commons-configuration:commons-configuration:1.6"
-
-  compile group: 'com.sun.jersey', name: 'jersey-servlet', version: '1.19'
-  compile group: 'io.swagger', name: 'swagger-jaxrs', version: '1.5.9'
+  compile group: 'io.kubernetes', name: 'client-java', version: '1.0.0'
 
   // https://mvnrepository.com/artifact/org.apache.curator/curator-framework
   compile group: 'org.apache.curator', name: 'curator-framework', version: '2.12.0'
@@ -66,27 +64,17 @@ dependencies {
   compile "org.projectlombok:lombok:$projectLombokVersion"
   compile "joda-time:joda-time:$jodaTimeVersion"
 
-  compile group: 'javax.el', name: 'javax.el-api', version: '2.2.4'
-  compile group: 'org.glassfish.web', name: 'javax.el', version: '2.2.4'
-
-  compile "com.google.inject:guice:$guiceVersion"
-  compile "com.google.inject.extensions:guice-servlet:$guiceVersion"
-
   compile "org.eclipse.jetty:jetty-server:$jettyVersion"
   compile "org.eclipse.jetty:jetty-servlet:$jettyVersion"
 
   compile "org.glassfish.jersey.core:jersey-common:$jerseyVersion"
   compile "org.glassfish.jersey.core:jersey-server:$jerseyVersion"
   compile "org.glassfish.jersey.containers:jersey-container-servlet:$jerseyVersion"
+  compile 'org.glassfish.jersey.media:jersey-media-multipart:2.26-b07'
+  compile 'org.glassfish.jersey.media:jersey-media-json-jackson:2.26-b07'
+  compile 'org.glassfish.jersey.media:jersey-media-moxy:2.26-b07'
   compile "org.glassfish.jersey.inject:jersey-hk2:$jerseyVersion"
   compile "org.glassfish.jersey.media:jersey-media-json-jackson:$jerseyVersion"
-
-  compile "com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.9.2"
-  compile "com.fasterxml.jackson.datatype:jackson-datatype-joda:2.9.0"
-
-  compile "com.squarespace.jersey2-guice:jersey2-guice-impl:1.0.6"
-  compile "org.glassfish.hk2:hk2:$hk2Version"
-  compile "org.glassfish.hk2:guice-bridge:$hk2Version"
 
   compile 'org.hibernate:hibernate-core:5.2.11.Final'
   testCompile 'org.hibernate:hibernate-core:5.2.11.Final'
@@ -94,11 +82,6 @@ dependencies {
   testCompile group: 'org.hibernate', name: 'hibernate-c3p0', version: '5.2.11.Final'
 
   compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.1.2'
-
-  // compile "com.zaxxer:HikariCP:2.7.7"
-  // compile "mysql:mysql-connector-java:5.1.45"
-
-  compile group: 'io.kubernetes', name: 'client-java', version: '1.0.0'
 
   testCompile "junit:junit:$junitVersion"
 }

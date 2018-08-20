@@ -15,15 +15,15 @@ public class JobController extends BaseController {
   private static JobDAO dao = new JobDAO();
 
   public Job getById(Long id) throws Exception {
-    final AtomicReference<Job> td = new AtomicReference<>();
-    doWork(session -> td.set(dao.getById(id, session)));
-    return td.get();
+    final AtomicReference<Job> j = new AtomicReference<>();
+    doWork(session -> j.set(dao.getById(id, session)));
+    return j.get();
   }
 
   public Job create(Job job) throws Exception {
-    final AtomicReference<Job> jobId = new AtomicReference<>();
-    doWork(session -> jobId.set(dao.create(job, session)));
-    return jobId.get();
+    final AtomicReference<Job> j = new AtomicReference<>();
+    doWork(session -> j.set(dao.create(job, session)));
+    return j.get();
   }
 
   public Job createIfNotExists(Job job) throws Exception {

@@ -133,8 +133,6 @@ public class Job extends AbstractDatabaseItem {
     this.description = description;
     this.jobType = jobType;
     this.dockerImageName = dockerImageName;
-
-    setCreatedAt(new Timestamp(System.currentTimeMillis()));
   }
 }
 

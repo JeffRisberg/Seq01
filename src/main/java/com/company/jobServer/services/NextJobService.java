@@ -44,20 +44,6 @@ public class NextJobService {
     }
   }
 
-  Set<Job> queryDependencies(Set<Job> dependencies, Job target) {
-    if (dependencies.contains(target)) {
-      return dependencies;
-    }
-
-    dependencies.add(target);
-
-    for (JobDependency jd : jobDependencies) {
-      if (jd.getToId() == target.getId())
-        queryDependencies(dependencies, jd.getFrom());
-    }
-    return dependencies;
-  }
-
   public Optional<JobExecution> getJobExecution(Job job) {
     return jobExecutions.stream().filter(
       je -> je.getJob().getId() == job.getId()).findFirst();

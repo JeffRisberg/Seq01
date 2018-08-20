@@ -17,15 +17,15 @@ public class JobExecutionController extends BaseController {
   private static JobExecutionDAO dao = new JobExecutionDAO();
 
   public JobExecution getById(Long id) throws Exception {
-    final AtomicReference<JobExecution> td = new AtomicReference<>();
-    doWork(session -> td.set(dao.getById(id, session)));
-    return td.get();
+    final AtomicReference<JobExecution> je = new AtomicReference<>();
+    doWork(session -> je.set(dao.getById(id, session)));
+    return je.get();
   }
 
   public JobExecution create(JobExecution jobExecution) throws Exception {
-    final AtomicReference<JobExecution> jobExecutionId = new AtomicReference<>();
-    doWork(session -> jobExecutionId.set(dao.create(jobExecution, session)));
-    return jobExecutionId.get();
+    final AtomicReference<JobExecution> je = new AtomicReference<>();
+    doWork(session -> je.set(dao.create(jobExecution, session)));
+    return je.get();
   }
 
   public boolean delete(Long id) throws Exception {

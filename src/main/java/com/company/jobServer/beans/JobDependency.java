@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 
 /**
- *
+ * A JobDependency describes how one job depends upon another.
  */
 @Data
 @Entity
@@ -28,7 +28,7 @@ public class JobDependency extends AbstractDatabaseItem {
 
   @Column(name = "from_id")
   @NotNull
-  @ApiModelProperty(required = true, value = "Foreign key to upstream dag node")
+  @ApiModelProperty(required = true, value = "Foreign key to upstream job node")
   private Long fromId;
 
   @ManyToOne()
@@ -39,7 +39,7 @@ public class JobDependency extends AbstractDatabaseItem {
 
   @Column(name = "to_id")
   @NotNull
-  @ApiModelProperty(required = true, value = "Foreign key to downstream dag node")
+  @ApiModelProperty(required = true, value = "Foreign key to downstream job node")
   private Long toId;
 
   /**
@@ -53,8 +53,6 @@ public class JobDependency extends AbstractDatabaseItem {
     this.fromId = from.getId();
     this.to = to;
     this.toId = to.getId();
-
-    setCreatedAt(new Timestamp(System.currentTimeMillis()));
   }
 }
 
