@@ -176,7 +176,7 @@ public class JobServer {
     executor.shutdown();
   }
 
-  protected static void x(Job rootJob) throws Exception {
+  protected static void triggerJobAndPrintNextJobs(Job rootJob) throws Exception {
     JobController jc = new JobController();
     JobExecutionController jec = new JobExecutionController();
     JobDependencyController jdc = new JobDependencyController();
@@ -241,11 +241,11 @@ public class JobServer {
       rootJob = matchingJobs.get(0);
     }
 
-    x(rootJob);
+    triggerJobAndPrintNextJobs(rootJob);
 
     Job job5 = jc.getById(5L);
     if (job5 != null) {
-      x(job5);
+      triggerJobAndPrintNextJobs(job5);
     }
   }
 }
