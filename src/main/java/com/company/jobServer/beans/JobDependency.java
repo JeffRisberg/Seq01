@@ -43,12 +43,12 @@ public class JobDependency extends AbstractDatabaseItem {
   private Long toId;
 
   /**
-   * Helpful setup method
+   * Helpful constructor
    *
    * @param from
    * @param to
    */
-  public void assign(Job from, Job to) {
+  public JobDependency(Job from, Job to) {
     this.from = from;
     this.fromId = from.getId();
     this.to = to;

@@ -231,9 +231,16 @@ public class JobServer {
       Job job102 = new Job(createdJob100, "job102", "job102 desc", JobType.CONNECTOR, "us.gcr.io/aisera-123/connector-jira:Milestone_8.1");
       Job createdJob102 = jc.create(job102);
 
-      JobDependency jd12 = new JobDependency();
-      jd12.assign(createdJob101, createdJob102);
-      jdc.create(jd12);
+      Job job103 = new Job(createdJob100, "job103", "job103 desc", JobType.CONNECTOR, "us.gcr.io/aisera-123/connector-jira:Milestone_8.1");
+      Job createdJob103 = jc.create(job103);
+
+      Job job104 = new Job(createdJob100, "job104", "job104 desc", JobType.CONNECTOR, "us.gcr.io/aisera-123/connector-jira:Milestone_8.1");
+      Job createdJob104 = jc.create(job104);
+
+      jdc.create(new JobDependency(createdJob101, createdJob102));
+      jdc.create(new JobDependency(createdJob101, createdJob103));
+      jdc.create(new JobDependency(createdJob102, createdJob104));
+      jdc.create(new JobDependency(createdJob103, createdJob104));
 
       rootJob = createdJob100;
     } else {
