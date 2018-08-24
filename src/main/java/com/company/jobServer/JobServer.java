@@ -249,10 +249,5 @@ public class JobServer {
     }
 
     triggerJobAndPrintNextJobs(rootJob);
-
-    Job job5 = jc.getById(5L);
-    if (job5 != null) {
-      triggerJobAndPrintNextJobs(job5);
-    }
   }
 }

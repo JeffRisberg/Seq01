@@ -78,7 +78,7 @@ public class NextJobService {
           JobExecution parentJE = je.getParentExecution();
 
           // Make sure this execution is within the target execution
-          if (parentJE.getId() != targetExecution.getId()) {
+          if (parentJE == null || parentJE.getId() != targetExecution.getId()) {
             continue;
           }
 
