@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @Entity
-@Table(name = "Algorithm", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "image_tag"})})
+@Table(name = "algorithm", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "image_tag"})})
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Algorithm extends AbstractDatabaseItem {
