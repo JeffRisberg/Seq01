@@ -5,7 +5,9 @@ import com.company.jobServer.beans.JobExecution;
 import com.company.jobServer.common.RestTools;
 import com.company.jobServer.controllers.JobController;
 import com.company.jobServer.controllers.JobExecutionController;
+import com.company.jobServer.executors.CollectionJobExecutor;
 import com.company.jobServer.executors.ConnectorJobExecutor;
+import com.company.jobServer.executors.ModelJobExecutor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -51,9 +53,30 @@ public class JobExecutions {
 
       System.out.println("Env Vars " + envVars);
 
-      ConnectorJobExecutor jobExecutor = new ConnectorJobExecutor();
+      JobExecution jobExecution = null;
 
-      JobExecution jobExecution = jobExecutor.start(job, envVars);
+      switch (job.getJobType()) {
+        case COLLECTION:
+          CollectionJobExecutor collectionJobExecutor = new CollectionJobExecutor();
+
+          jobExecution = collectionJobExecutor.start(job, null, envVars);
+          break;
+
+        case CONNECTOR:
+          ConnectorJobExecutor connectorJobExecutor = new ConnectorJobExecutor();
+
+          jobExecution = connectorJobExecutor.start(job, null, envVars);
+          break;
+
+        case MODEL:
+          ModelJobExecutor modelJobExecutor = new ModelJobExecutor();
+
+          jobExecution = modelJobExecutor.start(job, null, envVars);
+          break;
+
+        default:
+          log.error("Unknown job type");
+      }
 
       return Response.ok(jobExecution).build();
     } catch (Exception e) {

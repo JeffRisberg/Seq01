@@ -25,6 +25,10 @@ public class JobExecutionDAO extends BaseDAOImpl {
     return super.create(obj, JobExecution.class, session);
   }
 
+  public Boolean update(JobExecution obj, @NonNull Session session) {
+    return super.update(obj, session);
+  }
+
   public JobExecution getById(Long id, @NonNull Session session) {
     return super.getById(JobExecution.class, id, session);
   }

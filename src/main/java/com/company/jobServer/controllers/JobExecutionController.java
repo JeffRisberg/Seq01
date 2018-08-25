@@ -28,6 +28,12 @@ public class JobExecutionController extends BaseController {
     return je.get();
   }
 
+  public Boolean update(JobExecution jobExecution) throws Exception {
+    final AtomicReference<Boolean> je = new AtomicReference<>();
+    doWork(session -> je.set(dao.update(jobExecution, session)));
+    return je.get();
+  }
+
   public boolean delete(Long id) throws Exception {
     final AtomicReference<Boolean> deleted = new AtomicReference<>();
     doWork(session -> deleted.set(dao.delete(id, session)));

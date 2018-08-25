@@ -176,33 +176,6 @@ public class JobServer {
     executor.shutdown();
   }
 
-  protected static void triggerJobAndPrintNextJobs(Job rootJob) throws Exception {
-    JobController jc = new JobController();
-    JobExecutionController jec = new JobExecutionController();
-    JobDependencyController jdc = new JobDependencyController();
-
-    List<JobExecution> jeList = jec.getByJobId(rootJob.getId());
-    JobExecution jobExecution = null;
-
-    if (jeList.size() == 0) {
-      System.out.println("building je");
-      jobExecution = new JobExecution();
-      jobExecution.setJob(rootJob);
-      jobExecution.setJobId(rootJob.getId());
-      jec.create(jobExecution);
-    } else {
-      System.out.println("using je");
-      jobExecution = jeList.get(0);
-    }
-
-    NextJobService nextJobService = new NextJobService(jobExecution);
-
-    List<Job> nextJobs = nextJobService.getNextJobs();
-    for (Job job : nextJobs) {
-      System.out.println("next job for root job " + rootJob.getName() + " : " + job.getName());
-    }
-  }
-
   public static void main(String[] args) throws Exception {
     startJobServer();
 
@@ -220,7 +193,7 @@ public class JobServer {
 
     Job rootJob = null;
     if (matchingJobs.size() == 0) {
-      System.out.println("building jobs");
+      System.out.println("building initial jobs");
       // set up the test jobs
       Job job100 = new Job(null, "job100", "job100 desc", JobType.COLLECTION, null);
       Job createdJob100 = jc.create(job100);
@@ -228,13 +201,13 @@ public class JobServer {
       Job job101 = new Job(createdJob100, "job101", "job101 desc", JobType.CONNECTOR, "us.gcr.io/aisera-123/connector-snow:Milestone_8.1");
       Job createdJob101 = jc.create(job101);
 
-      Job job102 = new Job(createdJob100, "job102", "job102 desc", JobType.CONNECTOR, "us.gcr.io/aisera-123/connector-jira:Milestone_8.1");
+      Job job102 = new Job(createdJob100, "job102", "job102 desc", JobType.CONNECTOR, "us.gcr.io/aisera-123/connector-jiraservicedesk:Milestone_8.1");
       Job createdJob102 = jc.create(job102);
 
-      Job job103 = new Job(createdJob100, "job103", "job103 desc", JobType.CONNECTOR, "us.gcr.io/aisera-123/connector-jira:Milestone_8.1");
+      Job job103 = new Job(createdJob100, "job103", "job103 desc", JobType.CONNECTOR, "us.gcr.io/aisera-123/connector-jiraservicedesk:Milestone_8.1");
       Job createdJob103 = jc.create(job103);
 
-      Job job104 = new Job(createdJob100, "job104", "job104 desc", JobType.CONNECTOR, "us.gcr.io/aisera-123/connector-jira:Milestone_8.1");
+      Job job104 = new Job(createdJob100, "job104", "job104 desc", JobType.CONNECTOR, "us.gcr.io/aisera-123/connector-jiraservicedesk:Milestone_8.1");
       Job createdJob104 = jc.create(job104);
 
       jdc.create(new JobDependency(createdJob101, createdJob102));
@@ -248,6 +221,6 @@ public class JobServer {
       rootJob = matchingJobs.get(0);
     }
 
-    triggerJobAndPrintNextJobs(rootJob);
+    //triggerJobAndPrintNextJobs(rootJob);
   }
 }

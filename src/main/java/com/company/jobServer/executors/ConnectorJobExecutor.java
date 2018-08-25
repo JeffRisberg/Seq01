@@ -9,8 +9,8 @@ import org.json.simple.JSONObject;
 public class ConnectorJobExecutor extends BaseJobExecutor {
 
   @Override
-  public JobExecution start(Job job, JSONObject envVars) {
-    return super.start(job, envVars);
+  public JobExecution start(Job job, JobExecution parentExecution, JSONObject envVars) {
+    return super.start(job, parentExecution, envVars);
   }
 
   @Override

@@ -12,6 +12,8 @@ import io.kubernetes.client.auth.ApiKeyAuth;
 import io.kubernetes.client.auth.HttpBasicAuth;
 import io.kubernetes.client.models.*;
 import io.kubernetes.client.util.Config;
+import io.kubernetes.client.util.KubeConfig;
+import io.kubernetes.client.util.authenticators.GCPAuthenticator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +29,12 @@ public class JobLaunchService {
 
   public DeploymentHandle launchJob(Job job, JobExecution jobExecution) {
     try {
-      String configFile = "/Users/jeff/.kube/config";
-      ApiClient client = Config.fromConfig(configFile);
+      KubeConfig.registerAuthenticator(new GCPAuthenticator());
+      ApiClient client = Config.defaultClient();
 
       ApiKeyAuth BearerToken = (ApiKeyAuth) client.getAuthentication("BearerToken");
 
-      if (BearerToken.getApiKey() == null) {
+      if (false && BearerToken.getApiKey() == null) {
         System.out.println("Setting up AppKey");
 
         BearerToken.setApiKey(Credentials.basic(
@@ -74,12 +76,12 @@ public class JobLaunchService {
   public ExecutionStatus getDeploymentStatus(DeploymentHandle deploymentHandle) throws Exception {
     System.out.println("checking deployment status on " + deploymentHandle);
     try {
-      String configFile = "/Users/jeff/.kube/config";
-      ApiClient client = Config.fromConfig(configFile);
+      KubeConfig.registerAuthenticator(new GCPAuthenticator());
+      ApiClient client = Config.defaultClient();
 
       ApiKeyAuth BearerToken = (ApiKeyAuth) client.getAuthentication("BearerToken");
 
-      if (BearerToken.getApiKey() == null) {
+      if (false && BearerToken.getApiKey() == null) {
         System.out.println("Setting up AppKey");
 
         BearerToken.setApiKey(Credentials.basic(

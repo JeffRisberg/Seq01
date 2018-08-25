@@ -4,12 +4,15 @@ import com.company.jobServer.JobServer;
 import com.company.jobServer.beans.Job;
 import com.company.jobServer.beans.JobExecution;
 import com.company.jobServer.beans.enums.JobStatus;
+import com.company.jobServer.beans.enums.JobType;
 import com.company.jobServer.common.ResourceLocator;
 import com.company.jobServer.common.orchestration.DeployableObject;
 import com.company.jobServer.common.orchestration.DeploymentHandle;
 import com.company.jobServer.common.orchestration.ExecutionType;
+import com.company.jobServer.controllers.JobController;
 import com.company.jobServer.controllers.JobExecutionController;
 import com.company.jobServer.services.JobLaunchService;
+import com.company.jobServer.services.NextJobService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -17,6 +20,7 @@ import org.json.simple.JSONObject;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -27,11 +31,12 @@ public class BaseJobExecutor implements IJobExecutor {
 
   protected final ObjectMapper mapper = new ObjectMapper();
 
+  static JobController jobController = new JobController();
   static JobExecutionController jobExecutionController = new JobExecutionController();
   static JobLaunchService jobLaunchService = new JobLaunchService();
 
   @Override
-  public JobExecution start(Job job, JSONObject envVars) {
+  public JobExecution start(Job job, JobExecution parentExecution, JSONObject envVars) {
     log.info("startJob " + job.getId() + " " + job.getName());
 
     try {
@@ -54,6 +59,8 @@ public class BaseJobExecutor implements IJobExecutor {
         .replace(":", "_").replace(" ", "_"));
       jobExecution.setJob(job);
       jobExecution.setJobId(job.getId());
+      jobExecution.setParentExecution(parentExecution);
+      jobExecution.setParentExecutionId(parentExecution != null ? parentExecution.getId() : null);
       jobExecution.setHandleData("{}");
       jobExecution.setEnvVars(envVars);
       jobExecution.setEffectiveEnvVars(effectiveEnvVars);
@@ -131,6 +138,37 @@ public class BaseJobExecutor implements IJobExecutor {
 
       log.info("JobExecution " + handle + " is done");
 
+      JobExecution parentExecution = jobExecution.getParentExecution();
+
+      JSONObject envVars = parentExecution.getEnvVars();
+
+      try {
+        jobExecution.setDone(true);
+        jobExecutionController.update(jobExecution);
+
+        log.info("recorded done in database");
+
+        NextJobService nextJobService = new NextJobService(parentExecution);
+
+        List<Job> nextJobs = nextJobService.getNextJobs();
+
+        for (Job nextJob : nextJobs) {
+          System.out.println("starting job " + nextJob.getName());
+
+          if (nextJob.getJobType() == JobType.CONNECTOR) {
+            ConnectorJobExecutor jobExecutor = new ConnectorJobExecutor();
+
+            jobExecutor.start(nextJob, parentExecution, envVars);
+          }
+          if (nextJob.getJobType() == JobType.MODEL) {
+            ModelJobExecutor jobExecutor = new ModelJobExecutor();
+
+            jobExecutor.start(nextJob, parentExecution, envVars);
+          }
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
       /*
       JobClient jobClient = new JobClient(handle);
 
