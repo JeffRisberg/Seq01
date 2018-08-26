@@ -144,6 +144,7 @@ public class BaseJobExecutor implements IJobExecutor {
 
       try {
         jobExecution.setDone(true);
+        jobExecution.setStatus(JobStatus.SUCCEEDED);
         jobExecutionController.update(jobExecution);
 
         log.info("recorded done in database");
@@ -152,19 +153,25 @@ public class BaseJobExecutor implements IJobExecutor {
 
         List<Job> nextJobs = nextJobService.getNextJobs();
 
-        for (Job nextJob : nextJobs) {
-          System.out.println("starting job " + nextJob.getName());
+        if (nextJobs.size() > 0) {
+          for (Job nextJob : nextJobs) {
+            System.out.println("starting job " + nextJob.getName());
 
-          if (nextJob.getJobType() == JobType.CONNECTOR) {
-            ConnectorJobExecutor jobExecutor = new ConnectorJobExecutor();
+            if (nextJob.getJobType() == JobType.CONNECTOR) {
+              ConnectorJobExecutor jobExecutor = new ConnectorJobExecutor();
 
-            jobExecutor.start(nextJob, parentExecution, envVars);
+              jobExecutor.start(nextJob, parentExecution, envVars);
+            }
+            if (nextJob.getJobType() == JobType.MODEL) {
+              ModelJobExecutor jobExecutor = new ModelJobExecutor();
+
+              jobExecutor.start(nextJob, parentExecution, envVars);
+            }
           }
-          if (nextJob.getJobType() == JobType.MODEL) {
-            ModelJobExecutor jobExecutor = new ModelJobExecutor();
-
-            jobExecutor.start(nextJob, parentExecution, envVars);
-          }
+        } else {
+          parentExecution.setDone(true);
+          parentExecution.setStatus(JobStatus.SUCCEEDED);
+          jobExecutionController.update(parentExecution);
         }
       } catch (Exception e) {
         e.printStackTrace();
