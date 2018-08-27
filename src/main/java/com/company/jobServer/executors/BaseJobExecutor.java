@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class BaseJobExecutor implements IJobExecutor {
   private final static String DOCKER_IMAGE_TAG = "company.docker.image.tag";
-  private final static String DEFAULT_DOCKER_IMAGE_TAG = "Milestone_8.1";
+  private final static String DEFAULT_DOCKER_IMAGE_TAG = "Milestone_8.2";
 
   protected final ObjectMapper mapper = new ObjectMapper();
 
