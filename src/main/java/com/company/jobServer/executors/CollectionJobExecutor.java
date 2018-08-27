@@ -20,11 +20,24 @@ public class CollectionJobExecutor extends BaseJobExecutor {
       JobExecution jobExecution = null;
 
       if (jeList.size() == 0) {
+        JSONObject effectiveEnvVars = new JSONObject();
+        if (rootJob.getEnvVars() != null) {
+          effectiveEnvVars.putAll(rootJob.getEnvVars());
+        }
+        if (envVars != null) {
+          effectiveEnvVars.putAll(envVars);
+        }
+
+        System.out.println("effectiveEnvVars:  " + effectiveEnvVars);
+
         jobExecution = new JobExecution();
         jobExecution.setJob(rootJob);
         jobExecution.setJobId(rootJob.getId());
         jobExecution.setParentExecution(parentExecution);
         jobExecution.setParentExecutionId(parentExecution != null ? parentExecution.getId() : null);
+        jobExecution.setEnvVars(envVars);
+        jobExecution.setEffectiveEnvVars(effectiveEnvVars);
+
         jobExecutionController.create(jobExecution);
       } else {
         jobExecution = jeList.get(0);

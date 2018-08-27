@@ -100,17 +100,22 @@ public class BaseJobExecutor implements IJobExecutor {
 
         DeploymentHandle handle = jobLaunchService.launchJob(job, jobExecution);
 
-        jobExecution.setDeploymentHandle(handle.getName());
-        jobExecution.setHandleData(mapper.writeValueAsString(handle));
-        jobExecution.setOutputLocation(job.getOutputModel());
+        if (handle != null) {
+          jobExecution.setDeploymentHandle(handle.getName());
+          jobExecution.setHandleData(mapper.writeValueAsString(handle));
+          jobExecution.setOutputLocation(job.getOutputModel());
 
-        CompletionChecker completionChecker = new CompletionChecker(jobExecution, handle);
+          CompletionChecker completionChecker = new CompletionChecker(jobExecution, handle);
 
-        ScheduledFuture<?> future = JobServer.executor.scheduleAtFixedRate
-          (completionChecker, 30, 30, TimeUnit.SECONDS);
+          ScheduledFuture<?> future = JobServer.executor.scheduleAtFixedRate
+            (completionChecker, 30, 30, TimeUnit.SECONDS);
 
-        JobServer.currentTimers.put(jobExecution.getDeploymentHandle(), future);
-
+          JobServer.currentTimers.put(jobExecution.getDeploymentHandle(), future);
+        }
+        else {
+          log.error("Could not start Kubernetes pod");
+          return null;
+        }
       } catch (Exception e) {
         log.error("Exception during deployment launch", e);
       }
