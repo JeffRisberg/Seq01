@@ -1,5 +1,6 @@
 package com.company.jobServer.beans;
 
+import com.company.jobServer.beans.dto.StreamDataType;
 import com.company.jobServer.beans.enums.ClusterType;
 import com.company.jobServer.beans.enums.JobScheduleType;
 import com.company.jobServer.beans.enums.JobType;
@@ -89,42 +90,13 @@ public class Job extends AbstractDatabaseItem {
   @ApiModelProperty(value = "Output Model location")
   private String outputModel;
 
-  // None of these are actually used yet, but we will leave the columns anyway
-  @Column(name = "cpu", columnDefinition = "TEXT")
-  @ApiModelProperty(value = "Specifies CPU reservation. Format for Kubernetes")
-  private String cpu = null;
+  @Column(name = "input_data_type")
+  @Enumerated(EnumType.STRING)
+  private StreamDataType inputDataType;
 
-  @Column(name = "memory", columnDefinition = "TEXT")
-  @ApiModelProperty(value = "Specifies memory reservation. Format for Kubernetes")
-  private String memory = null;
-
-  @Column(name = "volume_size", columnDefinition = "TEXT")
-  @ApiModelProperty(value = "The size of the ML storage volume that you want to provision")
-  private String volumeSizeInGB = null;
-
-  @Column(name = "max_concurrent_requests_per_container")
-  @ApiModelProperty(value = "Maximum number of concurrent requests. Minimum value: 1")
-  private Long maxConcurrentRequestsPerContainer = null;
-
-  @Column(name = "autoscale_enabled")
-  @ApiModelProperty(value = "Enable or disable the autoscaler.")
-  private Boolean autoscaleEnabled = null;
-
-  @Column(name = "max_replicas")
-  @ApiModelProperty(value = "Maximum number of pod replicas to scale up to. Minimum value: 1")
-  private Long maxReplicas = null;
-
-  @Column(name = "min_replicas")
-  @ApiModelProperty(value = "Minimum number of pod replicas to scale down to. Minimum value: 0")
-  private Long minReplicas = null;
-
-  @Column(name = "refresh_period_in_seconds")
-  @ApiModelProperty(value = "Refresh time for autoscaling trigger. Minimum value: 1")
-  private Long refreshPeriodInSeconds = null;
-
-  @Column(name = "target_utilization")
-  @ApiModelProperty(value = "Utilization percentage that triggers autoscaling. Minimum value: 0. Maximum value: 100")
-  private Long targetUtilization = null;
+  @Column(name = "output_data_type")
+  @Enumerated(EnumType.STRING)
+  private StreamDataType outputDataType;
 
   public Job(Job parent, String name, String description, JobType jobType, String dockerImageName) {
     this.parent = parent;
