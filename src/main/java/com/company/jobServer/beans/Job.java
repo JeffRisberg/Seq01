@@ -98,6 +98,9 @@ public class Job extends AbstractDatabaseItem {
   @Enumerated(EnumType.STRING)
   private StreamDataType outputDataType;
 
+  @Column(name = "ratio")
+  private float ratio;
+
   public Job(Job parent, String name, String description, JobType jobType, String dockerImageName) {
     this.parent = parent;
     this.parentId = parent != null ? parent.getId() : null;
