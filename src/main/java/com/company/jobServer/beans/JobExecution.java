@@ -43,7 +43,6 @@ public class JobExecution extends AbstractDatabaseItem {
   @ApiModelProperty(required = true, value = "Foreign key to parent JobExecution")
   private Long parentExecutionId;
 
-
   @Column(name = "tenant_id")
   @ApiModelProperty(value = "Tenant Id")
   private String tenantId;

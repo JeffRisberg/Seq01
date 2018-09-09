@@ -36,7 +36,7 @@ public class BaseJobExecutor implements IJobExecutor {
   static JobLaunchService jobLaunchService = new JobLaunchService();
 
   @Override
-  public JobExecution start(Job job, JobExecution parentExecution, JSONObject envVars) {
+  public JobExecution start(Job job, JobExecution parentJobExecution, JSONObject envVars) {
     log.info("startJob " + job.getId() + " " + job.getName());
 
     try {
@@ -48,7 +48,7 @@ public class BaseJobExecutor implements IJobExecutor {
         effectiveEnvVars.putAll(envVars);
       }
 
-      System.out.println("effectiveEnvVars:  " + effectiveEnvVars);
+      log.info("effectiveEnvVars: " + effectiveEnvVars);
 
       Timestamp deploymentStartDatetime = new Timestamp(new Date().getTime());
       JobExecution jobExecution = new JobExecution();
@@ -59,8 +59,8 @@ public class BaseJobExecutor implements IJobExecutor {
         .replace(":", "_").replace(" ", "_"));
       jobExecution.setJob(job);
       jobExecution.setJobId(job.getId());
-      jobExecution.setParentExecution(parentExecution);
-      jobExecution.setParentExecutionId(parentExecution != null ? parentExecution.getId() : null);
+      jobExecution.setParentExecution(parentJobExecution);
+      jobExecution.setParentExecutionId(parentJobExecution != null ? parentJobExecution.getId() : null);
       jobExecution.setHandleData("{}");
       jobExecution.setEnvVars(envVars);
       jobExecution.setEffectiveEnvVars(effectiveEnvVars);

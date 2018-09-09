@@ -50,8 +50,6 @@ public class JobExecutions {
 
       JSONObject envVars = (JSONObject) parser.parse(requestBody);
 
-      System.out.println("Env Vars " + envVars);
-
       JobExecution jobExecution = null;
 
       switch (job.getJobType()) {
