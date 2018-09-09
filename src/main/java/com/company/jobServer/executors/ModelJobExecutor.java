@@ -28,70 +28,70 @@ public class ModelJobExecutor extends BaseJobExecutor {
 
   @Override
   public JobExecution start(Job job, JobExecution parentExecution, JSONObject envVars) {
-        /*
-        ModelClient modelClient = new ModelClient();
+    /*
+    ModelClient modelClient = new ModelClient();
 
-        // Ask for algorithm by name (where name is referenceId string of the job, the tag is the value of BRANCH
-        Algorithm algorithm = modelClient.getAlgorithmByNameAndTag(job.getReferenceId(), BRANCH);
+    // Ask for algorithm by name (where name is referenceId string of the job, the tag is the value of BRANCH
+    Algorithm algorithm = modelClient.getAlgorithmByNameAndTag(job.getReferenceId(), BRANCH);
 
-        if (algorithm != null) {
-            log.info("Fetched the Algorithm from ModelServer");
+    if (algorithm != null) {
+        log.info("Fetched the Algorithm from ModelServer");
 
-            String name = algorithm.getName();
-            String imageId = algorithm.getImageId();
-            String imageTag = algorithm.getImageTag();
+        String name = algorithm.getName();
+        String imageId = algorithm.getImageId();
+        String imageTag = algorithm.getImageTag();
 
-            log.info("algorithm name " + name);
-            log.info("algorithm imageId " + imageId);
-            log.info("algorithm imageTag " + imageTag);
+        log.info("algorithm name " + name);
+        log.info("algorithm imageId " + imageId);
+        log.info("algorithm imageTag " + imageTag);
 
-            job.setDockerImageName(imageId);
-        } else {
-            log.info("Could not find Algorithm");
+        job.setDockerImageName(imageId);
+    } else {
+        log.info("Could not find Algorithm");
+    }
+
+    // Ask for TrainingJobConfig from ModelServer, because that contains information that:
+    //  1) changes from execution from execution
+    //  2) relies on information that should only be in the modelServer.
+    TrainingJobConfig trainingJobConfig =
+            modelClient.getTrainingJobConfigByAlgorithmNameTagAndTenant(job.getReferenceId(), BRANCH, job.getTenantId());
+
+    if (trainingJobConfig != null) {
+        log.info("Fetched the TrainingJobConfig from ModelServer");
+
+        String configString = trainingJobConfig.getConfig();
+        String outputLocation = trainingJobConfig.getOutputLocation();
+
+        log.info("configString " + configString);
+        log.info("outputLocation " + outputLocation);
+
+        try {
+            JSONObject configStringAsJsonObject = (JSONObject) jsonParser.parse(configString);
+
+            JSONObject inputParams = (JSONObject) configStringAsJsonObject.get("inputParams");
+            JSONObject hyperParameters = (JSONObject) configStringAsJsonObject.get("hyperParameters");
+
+            log.info("inputParams " + inputParams.toJSONString());
+            log.info("hyperParameters " + hyperParameters.toJSONString());
+
+            job.setRuntimeParams(inputParams);
+            job.setHyperParameters(hyperParameters);
+        } catch (Exception e) {
+            throw new RuntimeException("ModelJobExecutor: Unable to parse configuration " + configString);
         }
 
-        // Ask for TrainingJobConfig from ModelServer, because that contains information that:
-        //  1) changes from execution from execution
-        //  2) relies on information that should only be in the modelServer.
-        TrainingJobConfig trainingJobConfig =
-                modelClient.getTrainingJobConfigByAlgorithmNameTagAndTenant(job.getReferenceId(), BRANCH, job.getTenantId());
+        job.setOutputModel(outputLocation);
+    } else {
+        log.info("Could not find TrainingJobConfig");
+    }
 
-        if (trainingJobConfig != null) {
-            log.info("Fetched the TrainingJobConfig from ModelServer");
-
-            String configString = trainingJobConfig.getConfig();
-            String outputLocation = trainingJobConfig.getOutputLocation();
-
-            log.info("configString " + configString);
-            log.info("outputLocation " + outputLocation);
-
-            try {
-                JSONObject configStringAsJsonObject = (JSONObject) jsonParser.parse(configString);
-
-                JSONObject inputParams = (JSONObject) configStringAsJsonObject.get("inputParams");
-                JSONObject hyperParameters = (JSONObject) configStringAsJsonObject.get("hyperParameters");
-
-                log.info("inputParams " + inputParams.toJSONString());
-                log.info("hyperParameters " + hyperParameters.toJSONString());
-
-                job.setRuntimeParams(inputParams);
-                job.setHyperParameters(hyperParameters);
-            } catch (Exception e) {
-                throw new RuntimeException("ModelJobExecutor: Unable to parse configuration " + configString);
-            }
-
-            job.setOutputModel(outputLocation);
-        } else {
-            log.info("Could not find TrainingJobConfig");
-        }
-
-        if (algorithm == null) {
-            throw new RuntimeException("ModelJobExecutor: Could not find algorithm " + job.getReferenceId());
-        }
-        if (trainingJobConfig == null) {
-            throw new RuntimeException("ModelJobExecutor: Could not find trainingJobConfig for " + job.getReferenceId());
-        }
-        */
+    if (algorithm == null) {
+        throw new RuntimeException("ModelJobExecutor: Could not find algorithm " + job.getReferenceId());
+    }
+    if (trainingJobConfig == null) {
+        throw new RuntimeException("ModelJobExecutor: Could not find trainingJobConfig for " + job.getReferenceId());
+    }
+    */
 
     return super.start(job, parentExecution, envVars);
   }
