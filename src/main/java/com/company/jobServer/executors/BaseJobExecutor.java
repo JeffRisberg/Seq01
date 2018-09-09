@@ -98,6 +98,15 @@ public class BaseJobExecutor implements IJobExecutor {
 
         log.info("about to launch " + deployableObject);
 
+        JobExecution createdJobExecution = jobExecutionController.create(jobExecution);
+        if (createdJobExecution == null) {
+          log.error("createdJobExecution was null");
+          return null;
+        }
+
+        // Put the jobExecutionId as an environment variable passed via DeploymentObject
+        deployableObject.getEnv().put("job_execution_id", String.valueOf(createdJobExecution.getId()));
+
         DeploymentHandle handle = jobLaunchService.launchJob(job, jobExecution);
 
         if (handle != null) {
@@ -105,24 +114,40 @@ public class BaseJobExecutor implements IJobExecutor {
           jobExecution.setHandleData(mapper.writeValueAsString(handle));
           jobExecution.setOutputLocation(job.getOutputModel());
 
+          /*
+          JobExecutionState jobExecutionState = new JobExecutionState();
+          jobExecutionState.setHandle(createdJobExecution.getDeploymentHandle());
+          jobExecutionState.setStateDatetime(createdJobExecution.getStartedAt());
+          jobExecutionState.setStateInfo(mapper.readValue("{}", JSONObject.class));
+          jobExecutionState.setState(createdJobExecution.getStatus());
+
+          if (jobExecutionState.getHandle() != null) {
+            jobExecutionStateController.create(jobExecutionState);
+          }
+
+          JobExecutionSummary jobExecutionSummary = new JobExecutionSummary();
+          jobExecutionSummary.setJobId(job.getId());
+          jobExecutionSummary.setHandle(createdJobExecution.getDeploymentHandle());
+          jobExecutionSummary.setStartDatetime(createdJobExecution.getStartedAt());
+          jobExecutionSummary.setEndDatetime(createdJobExecution.getStartedAt());
+          jobExecutionSummaryController.create(jobExecutionSummary);
+          */
+
           CompletionChecker completionChecker = new CompletionChecker(jobExecution, handle);
 
           ScheduledFuture<?> future = JobServer.executor.scheduleAtFixedRate
             (completionChecker, 30, 30, TimeUnit.SECONDS);
 
           JobServer.currentTimers.put(jobExecution.getDeploymentHandle(), future);
-        }
-        else {
+        } else {
           log.error("Could not start Kubernetes pod");
           return null;
         }
       } catch (Exception e) {
-        log.error("Exception during deployment launch", e);
+        log.error("Exception during pod launch", e);
       }
 
-      JobExecution createdJobExecution = jobExecutionController.create(jobExecution);
-
-      return createdJobExecution;
+      return jobExecution;
     } catch (Exception e) {
       log.error("Exception in startJob", e);
       return null;

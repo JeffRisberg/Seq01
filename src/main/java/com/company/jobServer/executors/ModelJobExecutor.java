@@ -15,19 +15,19 @@ import java.util.List;
 
 @Slf4j
 public class ModelJobExecutor extends BaseJobExecutor {
-    private static final String TRAINING_HYPERPRAMS = "company_training_hyperparams";
+  private static final String TRAINING_HYPERPRAMS = "company_training_hyperparams";
 
-    private static final String TRAINING_SQL_HOST = "company_datastores_sql_host";
-    private static final String TRAINING_SQL_PORT = "company_datastores_sql_port";
-    private static final String TRAINING_SQL_USER = "company_sql_user";
-    private static final String TRAINING_SQL_PASSWORD = "company_sql_password";
+  private static final String TRAINING_SQL_HOST = "company_datastores_sql_host";
+  private static final String TRAINING_SQL_PORT = "company_datastores_sql_port";
+  private static final String TRAINING_SQL_USER = "company_sql_user";
+  private static final String TRAINING_SQL_PASSWORD = "company_sql_password";
 
-    public static String BRANCH = ResourceLocator.getResource("company_algorithms_image_tag").orElse("latest");
+  public static String BRANCH = ResourceLocator.getResource("company_algorithms_image_tag").orElse("latest");
 
-    public static JSONParser jsonParser = new JSONParser();
+  public static JSONParser jsonParser = new JSONParser();
 
-    @Override
-    public JobExecution start(Job job, JobExecution parentExecution, JSONObject envVars) {
+  @Override
+  public JobExecution start(Job job, JobExecution parentExecution, JSONObject envVars) {
         /*
         ModelClient modelClient = new ModelClient();
 
@@ -93,42 +93,42 @@ public class ModelJobExecutor extends BaseJobExecutor {
         }
         */
 
-        return super.start(job, parentExecution, envVars);
+    return super.start(job, parentExecution, envVars);
+  }
+
+  @Override
+  public void setupEnv(Job job, DeployableObject deployableObject) {
+    HashMap<String, String> env = new HashMap<>();
+
+    // Set up the training entry-point
+    List<String> command = new ArrayList<>();
+    command.add("/bin/bash");
+    command.add("-c");
+
+    List<String> args = new ArrayList<>();
+    args.add("chmod +x run_training; ./run_training");
+
+    deployableObject.setCommand(command);
+    deployableObject.setArgs(args);
+
+    try {
+      env.put(TRAINING_HYPERPRAMS, mapper.writeValueAsString(job.getHyperParameters()));
+    } catch (Exception e) {
+      log.error(e.getMessage());
     }
 
-    @Override
-    public void setupEnv(Job job, DeployableObject deployableObject) {
-        HashMap<String, String> env = new HashMap<>();
+    // Set sql source information (host, port, user, password)
+    env.put(TRAINING_SQL_HOST, ResourceLocator.getResource(JobServer.DB_HOST).orElse(JobServer.DEFAULT_DB_HOST));
+    env.put(TRAINING_SQL_PORT, ResourceLocator.getResource(JobServer.DB_PORT).orElse(JobServer.DEFAULT_DB_PORT));
+    env.put(TRAINING_SQL_USER, ResourceLocator.getResource(JobServer.DB_USER).orElse(JobServer.DEFAULT_DB_USER));
+    env.put(TRAINING_SQL_PASSWORD, ResourceLocator.getResource(JobServer.DB_PASSWORD).orElse(JobServer.DEFAULT_DB_PASSWORD));
 
-        // Set up the training entry-point
-        List<String> command = new ArrayList<>();
-        command.add("/bin/bash");
-        command.add("-c");
+    deployableObject.setEnv(env);
+  }
 
-        List<String> args = new ArrayList<>();
-        args.add("chmod +x run_training; ./run_training");
-
-        deployableObject.setCommand(command);
-        deployableObject.setArgs(args);
-
-        try {
-            env.put(TRAINING_HYPERPRAMS, mapper.writeValueAsString(job.getHyperParameters()));
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
-
-        // Set sql source information (host, port, user, password)
-        env.put(TRAINING_SQL_HOST, ResourceLocator.getResource(JobServer.DB_HOST).orElse(JobServer.DEFAULT_DB_HOST));
-        env.put(TRAINING_SQL_PORT, ResourceLocator.getResource(JobServer.DB_PORT).orElse(JobServer.DEFAULT_DB_PORT));
-        env.put(TRAINING_SQL_USER, ResourceLocator.getResource(JobServer.DB_USER).orElse(JobServer.DEFAULT_DB_USER));
-        env.put(TRAINING_SQL_PASSWORD, ResourceLocator.getResource(JobServer.DB_PASSWORD).orElse(JobServer.DEFAULT_DB_PASSWORD));
-
-        deployableObject.setEnv(env);
-    }
-
-    @Override
-    public void stop(JobExecution jobExecution, boolean force) {
-        Job job = jobExecution.getJob();
+  @Override
+  public void stop(JobExecution jobExecution, boolean force) {
+    Job job = jobExecution.getJob();
 
     /*
     ModelClient modelClient = new ModelClient();
@@ -136,12 +136,11 @@ public class ModelJobExecutor extends BaseJobExecutor {
     modelClient.deployModelForTenantForAlgorithm
       (jobExecution.getTenantId(), job.getReferenceId(), jobExecution.getOutputLocation());
     */
-        super.stop(jobExecution, force);
-    }
+    super.stop(jobExecution, force);
+  }
 
-    @Override
-    public void destroy(JobExecution jobExecution) {
-        super.destroy(jobExecution);
-    }
-
+  @Override
+  public void destroy(JobExecution jobExecution) {
+    super.destroy(jobExecution);
+  }
 }

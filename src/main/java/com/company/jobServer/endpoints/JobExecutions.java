@@ -30,7 +30,6 @@ public class JobExecutions {
   private static final JobController jobController = new JobController();
   private static final JobExecutionController jobExecutionController = new JobExecutionController();
 
-
   ObjectMapper mapper = new ObjectMapper();
   JSONParser parser = new JSONParser();
 

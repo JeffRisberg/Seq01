@@ -1,6 +1,6 @@
 package com.company.jobServer.beans;
 
-import com.company.jobServer.beans.dto.StreamDataType;
+import com.company.jobServer.beans.enums.StreamDataType;
 import com.company.jobServer.beans.enums.ClusterType;
 import com.company.jobServer.beans.enums.JobScheduleType;
 import com.company.jobServer.beans.enums.JobType;
@@ -13,7 +13,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 
 @Data
 @Entity
@@ -94,9 +93,15 @@ public class Job extends AbstractDatabaseItem {
   @Enumerated(EnumType.STRING)
   private StreamDataType inputDataType;
 
+  @Column(name = "input_data_type_label")
+  private String inputDataTypelabel;
+
   @Column(name = "output_data_type")
   @Enumerated(EnumType.STRING)
   private StreamDataType outputDataType;
+
+  @Column(name = "output_data_type_label")
+  private String outputDataTypelabel;
 
   @Column(name = "ratio")
   private float ratio;
