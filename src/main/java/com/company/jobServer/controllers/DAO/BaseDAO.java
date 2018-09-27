@@ -16,6 +16,8 @@ public interface BaseDAO {
 
   <T> List<T> getByCriteria(Class<T> type, List<FilterDescription> filterDescriptions, Session session) throws Exception;
 
+  <T> List<T> getByCriteria(Class<T> type, @NonNull Map<String, Object> params, Session session);
+
   int updateBySQL(@NonNull String sql, @NonNull Map<String, Object> params, Session session);
 
   <T> T getById(Class<T> type, String id, Session session);

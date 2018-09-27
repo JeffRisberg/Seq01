@@ -200,4 +200,32 @@ public class BaseDAOImpl implements BaseDAO {
       return false;
     }
   }
+
+  /**
+   * Use Criteria Builder to execute a SQL By Parameters.
+   *
+   * @param type
+   * @param params
+   * @param session
+   * @param <T>
+   * @return List of results
+   */
+  public <T> List<T> getByCriteria(Class<T> type, @NonNull Map<String, Object> params, Session session) {
+    try {
+      CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+      CriteriaQuery<T> criteriaQuery = criteriaBuilder.createQuery(type);
+      Root<T> root = criteriaQuery.from(type);
+      criteriaQuery.select(root);
+      AtomicReference<Predicate> p = new AtomicReference<>(criteriaBuilder.conjunction());
+      params.entrySet().stream().forEach(entry -> {
+        p.set(criteriaBuilder.and(p.get(), criteriaBuilder.equal(root.get(entry.getKey()), entry.getValue())));
+      });
+      criteriaQuery.where(p.get());
+      return session.createQuery(criteriaQuery).getResultList();
+    } catch (Exception e) {
+      log.error("getByCriteria:: exception", e);
+      return null;
+    }
+  }
 }
+
